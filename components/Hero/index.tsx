@@ -25,7 +25,7 @@ const Hero = () => {
               <h4 className="mb-4.5 text-lg font-medium text-black dark:text-white">
                 Trailblaze - Explore Scenic Routes and Trails
               </h4>
-              <h1 className="mb-10 pr=16 text-3xl font-bold text-black dark:text-white xl:text-hero whitespace-nowrap">
+              <h1 className="mb-10 pr=16 text-3xl font-bold text-black dark:text-white xl:text-hero">
               Tired of <TextTransition inline={true} springConfig={presets.gentle}>{PainPoints[index % PainPoints.length]}</TextTransition>
               </h1>
               <p>
