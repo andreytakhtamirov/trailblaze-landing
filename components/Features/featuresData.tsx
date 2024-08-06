@@ -4,14 +4,14 @@ const featuresData: Feature[] = [
   {
     id: 1,
     icon: "/images/icon/icon-01.svg",
-    title: "Bike-friendly routing",
+    title: "Bike-friendly Routing",
     description:
       "Find routes optimized for cycling, featuring trails, paths, and smaller roads to keep you clear of busy traffic.",
   },
   {
     id: 2,
     icon: "/images/icon/icon-02.svg",
-    title: "More Modes Tailored for Outdoor Exploration",
+    title: "Modes Tailored for Outdoor Exploration",
     description:
       "Choose from three available modes: hiking, cycling, and gravel cycling.",
   },
