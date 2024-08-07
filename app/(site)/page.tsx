@@ -19,17 +19,17 @@ export const metadata: Metadata = {
   // other metadata
 };
 
-export default function Home() {
+export default function Home() { 
   return (
     <main>
       <Hero />
       <CTA />
       {/* <Brands /> */}
       <Feature />
-      <About />
+      {/* <About /> */}
       {/* <FeaturesTab /> */}
-      <FunFact />
-      <Integration />
+      {/* <FunFact /> */}
+      {/* <Integration /> */}
       <FAQ />
       {/* <Testimonial /> */}
       {/* <Pricing /> */}

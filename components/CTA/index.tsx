@@ -10,7 +10,7 @@ const CTA = () => {
   return (
     <>
       {/* <!-- ===== CTA Start ===== --> */}
-      <section className="overflow-hidden px-4 py-4 md:px-8 lg:py-25 xl:py-30 2xl:px-0">
+      <section className="overflow-hidden px-4 py-4 md:px-8 lg:py-5 xl:py-5 2xl:px-0">
         <div className="mx-auto max-w-c-1390 rounded-lg bg-gradient-to-t from-[#F8F9FF] to-[#DEE7FF] px-7.5 py-12.5 dark:bg-blacksection dark:bg-gradient-to-t dark:from-transparent dark:to-transparent dark:stroke-strokedark md:px-12.5 xl:px-17.5 xl:py-15">
           <div className="flex flex-wrap gap-8 md:flex-nowrap md:items-center md:justify-between md:gap-0 mb-8">
             <motion.div
@@ -64,7 +64,7 @@ const CTA = () => {
               viewport={{ once: true }}
               className="animate_right lg:w-[60%]"
             >
-              <div className="mt-12 flex lg:flex-row md:flex-row sm:flex-row items-center xs:flex-col xs:gap-4">
+              <div className="mt-12 flex lg:flex-row md:flex-row sm:flex-row items-center xs:flex-col flex-col xs:gap-4">
                 <a
                   href="https://apps.apple.com/ca/app/trailblaze/id6450859439"
                   className='inline-flex items-center gap-2.5 rounded-full px-6 py-10 font-medium hover:opacity-90 w-full sm:w-1/2 lg:w-[300px] h-[60px] justify-between text-md sm:text-base md:text-lg lg:text-xl bg-black text-white'
