@@ -18,15 +18,19 @@ const Hero = () => {
 
   return (
     <>
-      <section className="overflow-hidden pb-20 pt-35 md:pt-40 xl:pb-25 xl:pt-46">
+      <section className="overflow-hidden pb-10 pt-35 md:pt-40 xl:pb-25 xl:pt-46">
         <div className="mx-auto max-w-c-1390 px-4 md:px-8 2xl:px-0">
           <div className="flex lg:items-center lg:gap-8 xl:gap-32.5">
-            <div className=" md:w-2/3">
+            <div className="md:w-2/3">
               <h4 className="mb-4.5 text-lg font-medium text-black dark:text-white">
                 Trailblaze - Explore Scenic Routes and Trails
               </h4>
-              <h1 className="mb-10 pr=16 text-3xl font-bold text-black dark:text-white xl:text-hero">
-              Tired of <TextTransition inline={true} springConfig={presets.gentle}>{PainPoints[index % PainPoints.length]}</TextTransition>
+              <h1 className="mb-10 pr=16 md:text-3xl font-bold text-black dark:text-white xl:text-hero sm:text-2xl xs:text-xl">
+              Tired of
+              &#8239;
+              <span className="relative inline-block before:absolute before:top-8.5 before:left-0 before:-z-1 before:h-1 before:w-full before:bg-titlebg dark:before:bg-titlebgdark ">
+                <TextTransition inline={true} springConfig={presets.gentle}>{PainPoints[index % PainPoints.length]}</TextTransition>
+                </span>
               </h1>
               <p>
               Trailblaze - Offering bike-friendly routing that goes beyond basic directions. Customize your journey to be as scenic or direct as you like, exploring picturesque trails and avoiding busy roads for a more enjoyable ride.

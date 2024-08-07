@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require('tailwindcss/defaultTheme')
 
 module.exports = {
   content: [
@@ -11,6 +12,10 @@ module.exports = {
   ],
   darkMode: "class",
   theme: {
+    screens: {
+      'xs': '330px',
+    ...defaultTheme.screens,
+    },
     fontFamily: {
       inter: ["Inter", "sans-serif"],
     },
