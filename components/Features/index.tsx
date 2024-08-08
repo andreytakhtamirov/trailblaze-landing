@@ -30,7 +30,6 @@ const Feature = () => {
           </div>
         </div>
       </section>
-
       {/* <!-- ===== Features End ===== --> */}
     </>
   );

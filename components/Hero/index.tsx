@@ -1,18 +1,21 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import TextTransition, { presets } from 'react-text-transition';
+import TextTransition, { presets } from "react-text-transition";
+import { motion } from "framer-motion";
 
-const PainPoints = ['Busy Roads?', 'Planning Routes?', 'Unclear Trail Info?', 'Repetitive Routes?'];
+const PainPoints = [
+  "Busy Roads?",
+  "Planning Routes?",
+  "Unclear Trail Info?",
+  "Repetitive Routes?",
+];
 
 const Hero = () => {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    const intervalId = setInterval(
-      () => setIndex((index) => index + 1),
-      4000,
-    );
+    const intervalId = setInterval(() => setIndex((index) => index + 1), 4000);
     return () => clearTimeout(intervalId);
   }, []);
 
@@ -20,20 +23,24 @@ const Hero = () => {
     <>
       <section className="overflow-hidden pb-10 pt-35 md:pt-40 lg:pb-15 xl:pb-15 xl:pt-46">
         <div className="mx-auto max-w-c-1390 px-4 md:px-8 2xl:px-0">
-          <div className="flex lg:items-center lg:gap-8 xl:gap-32.5 flex-col md:flex-row">
-            <div className="md:w-1/2 xs:w-full">
+          <div className="flex flex-col md:flex-row lg:items-center lg:gap-8 xl:gap-32.5">
+            <div className="xs:w-full md:w-3/5">
               <h4 className="mb-4.5 text-lg font-medium text-black dark:text-white">
                 Trailblaze - Explore Scenic Routes and Trails
               </h4>
-              <h1 className="mb-4 pr=16 md:text-3xl font-bold text-black dark:text-white xl:text-hero sm:text-2xl xs:text-xl">
-                Tired of
-                &#8239;
-                <span className="relative inline-block before:absolute before:top-6 xs:before:top-6 sm:before:top-7 md:before:top-8 lg:before:top-8 xl:before:top-13 before:left-0 before:-z-1 before:h-1 before:w-full before:bg-titlebg dark:before:bg-titlebgdark ">
-                  <TextTransition inline={true} springConfig={presets.gentle}>{PainPoints[index % PainPoints.length]}</TextTransition>
+              <h1 className="pr=16 mb-4 font-bold text-black dark:text-white xs:text-xl sm:text-2xl md:text-3xl xl:text-hero">
+                Tired of &#8239;
+                <span className="relative inline-block before:absolute before:left-0 before:top-6 before:-z-1 before:h-1 before:w-full before:bg-titlebg dark:before:bg-titlebgdark xs:before:top-6 sm:before:top-7 md:before:top-8 lg:before:top-8 xl:before:top-13 ">
+                  <TextTransition inline={true} springConfig={presets.gentle}>
+                    {PainPoints[index % PainPoints.length]}
+                  </TextTransition>
                 </span>
               </h1>
               <p>
-                Trailblaze - Offering bike-friendly routing that goes beyond basic directions. Customize your journey to be as scenic or direct as you like, exploring picturesque trails and avoiding busy roads for a more enjoyable ride.
+                Trailblaze - Offering bike-friendly routing that goes beyond
+                basic directions. Customize your journey to be as scenic or
+                direct as you like, exploring picturesque trails and avoiding
+                busy roads for a more enjoyable ride.
               </p>
               <br></br>
               <p className="text-md font-semibold">
@@ -41,9 +48,26 @@ const Hero = () => {
               </p>
             </div>
 
-            <div className="mt-10 animate_right md:w-1/2 s:w-full">
+            <motion.div
+              className="animate_right s:w-full mt-10 md:w-1/2"
+              variants={{
+                hidden: {
+                  opacity: 0,
+                  x: -20,
+                },
+
+                visible: {
+                  opacity: 1,
+                  x: 0,
+                },
+              }}
+              initial="hidden"
+              whileInView="visible"
+              transition={{ duration: 1, delay: 0.1 }}
+              viewport={{ once: true }}
+            >
               <div className="relative 2xl:-mr-7.5">
-                <div className="relative aspect-[2/3] sm:w-sm xs:w-xs bg-transparent w-full">
+                <div className="sm:w-sm xs:w-xs relative aspect-[2/3] w-full bg-transparent">
                   <Image
                     className="object-contain drop-shadow-2xl"
                     src="/images/features/app-screenshot.png"
@@ -52,12 +76,12 @@ const Hero = () => {
                   />
                 </div>
                 <div className="mt-10">
-                  <p className="mt-5 text-black dark:text-white text-center">
+                  <p className="mt-5 text-center text-black dark:text-white">
                     Get the app for free on iOS and Android.
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
