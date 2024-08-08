@@ -73,6 +73,7 @@ const Hero = () => {
                     src="/images/features/app-screenshot.png"
                     alt="Hero"
                     fill
+                    draggable="false"
                   />
                 </div>
                 <div className="mt-10">

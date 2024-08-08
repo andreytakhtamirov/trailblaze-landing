@@ -75,6 +75,7 @@ const CTA = () => {
                       WebkitMaskImage:
                         "linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 70%, rgba(0, 0, 0, 0) 100%)",
                     }}
+                    draggable="false"
                   />
                 </div>
               </div>
