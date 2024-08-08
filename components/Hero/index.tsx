@@ -24,7 +24,7 @@ const Hero = () => {
       <section className="overflow-hidden pb-10 pt-35 md:pt-40 lg:pb-15 xl:pb-15 xl:pt-46">
         <div className="mx-auto max-w-c-1390 px-4 md:px-8 2xl:px-0">
           <div className="flex flex-col md:flex-row lg:items-center lg:gap-8 xl:gap-32.5">
-            <div className="xs:w-full md:w-3/5">
+            <div className="xs:w-full md:w-2/3 lg:w-3/5">
               <h4 className="mb-4.5 text-lg font-medium text-black dark:text-white">
                 Trailblaze - Explore Scenic Routes and Trails
               </h4>
