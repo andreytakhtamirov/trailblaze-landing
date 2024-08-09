@@ -73,7 +73,9 @@ const Hero = () => {
                     src="/images/features/app-screenshot.png"
                     alt="Hero"
                     fill
+                    sizes="(max-width: 768px) 90vw, 66vw"
                     draggable="false"
+                    priority={true}
                   />
                 </div>
                 <div className="mt-10">

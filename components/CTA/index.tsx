@@ -69,6 +69,8 @@ const CTA = () => {
                     src="/images/features/app-screenshot-2.png"
                     alt="Hero"
                     fill
+                    priority={false}
+                    sizes="(max-width: 768px) 90vw, 66vw"
                     style={{
                       maskImage:
                         "linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 70%, rgba(0, 0, 0, 0) 100%)",
