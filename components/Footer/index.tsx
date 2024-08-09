@@ -29,7 +29,7 @@ const Footer = () => {
                 className="animate_top w-1/2 lg:w-1/4"
               >
                 <a href="/" className="relative">
-                  {/* <Image
+                  <Image
                     width={200}
                     height={80}
                     src="/images/logo/logo-light.svg"
@@ -42,7 +42,7 @@ const Footer = () => {
                     src="/images/logo/logo-dark.svg"
                     alt="Logo"
                     className="hidden dark:block"
-                  /> */}
+                  />
                 </a>
                 <p className="mb-1.5 mt-10 text-sectiontitle uppercase tracking-[5px]">
                   contact
@@ -144,7 +144,7 @@ const Footer = () => {
               whileInView="visible"
               transition={{ duration: 1, delay: 0.1 }}
               viewport={{ once: true }}
-              className="animate_top"
+              className="animate_top mr-10"
             >
               <ul className="flex items-center gap-5">
                 <li>
