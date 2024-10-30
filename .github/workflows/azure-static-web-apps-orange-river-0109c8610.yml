@@ -15,14 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          lfs: false
       - name: create env file
         run: |
           touch .env
           echo ASSET_HOST=${{ secrets.ASSET_HOST }} >> .env
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-          lfs: false
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
