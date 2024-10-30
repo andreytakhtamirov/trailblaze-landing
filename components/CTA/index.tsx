@@ -69,7 +69,6 @@ const CTA = () => {
                     src="/images/features/app-screenshot-2.png"
                     alt="Hero"
                     fill
-                    priority={false}
                     sizes="(max-width: 768px) 90vw, 66vw"
                     style={{
                       maskImage:

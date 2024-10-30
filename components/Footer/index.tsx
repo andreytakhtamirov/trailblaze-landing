@@ -34,14 +34,12 @@ const Footer = () => {
                       src="/images/logo/logo-dark.svg"
                       alt="logo"
                       fill
-                      priority={true}
                       className="absolute inset-0 hidden dark:block"
                     />
                     <Image
                       src="/images/logo/logo-light.svg"
                       alt="logo"
                       fill
-                      priority={true}
                       className="absolute inset-0 dark:hidden"
                     />
                   </div>

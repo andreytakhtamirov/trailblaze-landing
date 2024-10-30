@@ -1,0 +1,11 @@
+#!/bin/bash
+
+BUCKET_NAME="trailblaze-assets"
+CDN_PATH="_next/static/"
+IMAGE_PATH="public/images/"
+
+# Upload static files
+gsutil -m rsync -r .next/static gs://$BUCKET_NAME/$CDN_PATH
+
+# Upload images
+gsutil -m rsync -r $IMAGE_PATH gs://$BUCKET_NAME/images/
