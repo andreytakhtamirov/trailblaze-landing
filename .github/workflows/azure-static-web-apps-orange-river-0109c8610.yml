@@ -11,17 +11,18 @@ on:
 
 jobs:
   setup_gcloud_job:
-      steps:
-      - id: 'auth'
-        uses: 'google-github-actions/auth@v2'
-        with:
-          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+    runs-on: ubuntu-latest
+    steps:
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
 
-      - name: 'Use gcloud CLI'
-        run: 'gcloud info'
+    - name: 'Use gcloud CLI'
+      run: 'gcloud info'
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
