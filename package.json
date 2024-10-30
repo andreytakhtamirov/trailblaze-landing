@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "upload": "./upload-static-to-cdn.sh",
+    "upload": "./sync-to-bucket.sh",
     "start": "next start",
     "lint": "next lint",
     "deploy": "npm run build && npm run upload"

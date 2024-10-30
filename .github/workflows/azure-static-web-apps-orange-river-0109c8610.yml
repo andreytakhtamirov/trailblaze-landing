@@ -10,6 +10,18 @@ on:
       - main
 
 jobs:
+  setup_gcloud_job:
+      steps:
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
@@ -20,7 +32,7 @@ jobs:
         with:
           submodules: true
           lfs: false
-      - name: create env file
+      - name: Create env file
         run: |
           touch .env
           echo ASSET_HOST=${{ secrets.ASSET_HOST }} >> .env
@@ -37,6 +49,9 @@ jobs:
           api_location: "" # Api source code path - optional
           output_location: "" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
+      - name: Run GCS Upload Script
+        run: |
+          ./sync-to-bucket.sh
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
