@@ -8,6 +8,13 @@ export const metadata: Metadata = {
   title: "Trailblaze | Explore Scenic Routes and Trails",
   description:
     "Discover and customize scenic routes with Trailblaze. Avoid busy roads, find trails for hiking, cycling, and more. Enjoy outdoor adventures with our easy-to-use app available on iOS and Android.",
+  icons: [
+    {
+      rel: "icon",
+      url: "https://cdn.trailblaze.cc/images/favicon.ico",
+      type: "image/x-icon"
+    },
+  ]
 };
 
 export default function Home() {

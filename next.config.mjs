@@ -1,6 +1,7 @@
 import { PHASE_DEVELOPMENT_SERVER } from 'next/constants.js'
 
 const assetHost = process.env.ASSET_HOST;
+const cdnAddress = process.env.CDN_ADDRESS;
 export default (phase) => {
     const isDev = phase === PHASE_DEVELOPMENT_SERVER
     /**
@@ -16,9 +17,9 @@ export default (phase) => {
             remotePatterns: [
                 {
                     protocol: 'https',
-                    hostname: 'storage.googleapis.com',
+                    hostname: cdnAddress,
                     port: '',
-                    pathname: '/trailblaze-assets/**',
+                    pathname: '/**',
                 },
             ],
         },
