@@ -2,6 +2,12 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
+  safelist: [
+    'bg-red-400',
+    'bg-blue-400',
+    'border-red-400',
+    'border-blue-400'
+  ],
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -145,6 +151,18 @@ module.exports = {
         line1: "line 3s linear infinite",
         line2: "line 6s linear infinite",
         line3: "line 9s linear infinite",
+      },
+      container: {
+        center: true,
+        padding: '2rem',
+        screens: {
+          xs: '100%',
+          sm: '100%',
+          md: '720px',
+          lg: '960px',
+          xl: '1140px',
+          '2xl': '1280px',
+        },
       },
     },
   },

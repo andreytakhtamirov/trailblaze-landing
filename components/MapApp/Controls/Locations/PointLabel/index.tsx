@@ -1,0 +1,81 @@
+import classNames from "classnames";
+import { LngLat } from "mapbox-gl";
+import { MdOutlineEdit } from "react-icons/md";
+
+export enum PointLabelType {
+    origin,
+    destination
+}
+
+interface PointLabelProps {
+    type: PointLabelType;
+    point: LngLat | null;
+    isSettingOrigin: boolean | null;
+    onClick: () => void;
+}
+
+const PointLabel: React.FC<PointLabelProps> = ({ type, point, isSettingOrigin, onClick }) => {
+
+    function label(): string {
+        switch (type) {
+            case PointLabelType.origin:
+                return "Origin";
+            case PointLabelType.destination:
+                return "Destination";
+        }
+    }
+
+    function isActive(): boolean {
+        switch (type) {
+            case PointLabelType.origin:
+                return isSettingOrigin === true;
+            case PointLabelType.destination:
+                return isSettingOrigin === false;
+        }
+    }
+
+    function colorForType(): string {
+        switch (type) {
+            case PointLabelType.origin:
+                return "red-400";
+            case PointLabelType.destination:
+                return "blue-400";
+        }
+    }
+
+    function markerToString(point: LngLat | null) {
+        if (!point) {
+            return isActive() ? "Click on Map to Select" : "Click to change";
+        }
+
+        const { lng, lat } = point;
+        return `${lng.toFixed(3)}, ${lat.toFixed(3)}`;
+    }
+
+    return (
+        <>
+            <div className="flex flex-row xl:flex-col md:flex-row xs:flex-col justify-between w-full ">
+                <div className="flex flex-col lg:flex-row xl:flex-col sm:flex-col lg:gap-4 xl:gap-0">
+                    <p className="font-medium">{label()}</p>
+                    <div
+                        className={classNames("border-4", {
+                            [`border-${colorForType()}`]: isActive(),
+                        })}
+                        onClick={onClick}
+                    >
+
+                        <div className="px-4 w-full flex flex-row items-center gap-4 justify-between">
+                            <div className={classNames(`bg-${colorForType()} h-4 w-4 flex-shrink-0 rounded-full`)} />
+                            <span className="flex-grow">{markerToString(point)}</span>
+                            <MdOutlineEdit
+                                className={classNames("text-2xl", { "invisible": isActive() })}
+                            />
+                        </div>
+                    </div>
+                </div >
+            </div>
+        </>
+    );
+}
+
+export default PointLabel;

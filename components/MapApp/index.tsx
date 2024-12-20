@@ -1,7 +1,8 @@
 'use client'
 
 import Slider from '@/components/MapApp/Controls/Slider';
-import TransporationMode from '@/components/MapApp/Controls/TransportationMode';
+import TransportationMode from '@/components/MapApp/Controls/TransportationMode';
+import Locations from '@/components/MapApp/Controls/Locations'
 import { fetchRoute } from '@/requests/fetchRoute';
 import { decodeWithElevation } from '@/util/polylineDecode';
 import mapboxgl, { LngLat } from 'mapbox-gl'
@@ -14,14 +15,15 @@ export default function MapApp() {
   const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainer = useRef<HTMLDivElement | null>(null);
-  const [isSettingOrigin, setIsSettingOrigin] = useState<boolean>(true);
+  const [isSettingOrigin, setIsSettingOrigin] = useState<boolean | null>(null);
   const originMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const destinationMarkerRef = useRef<mapboxgl.Marker | null>(null);
-  const [originLabel, setOriginLabel] = useState(markerToString(originMarkerRef));
-  const [destinationLabel, setDestinationLabel] = useState(markerToString(destinationMarkerRef));
+
+  const [originPoint, setOriginPoint] = useState<LngLat | null>(null);
+  const [destinationPoint, setDestinationPoint] = useState<LngLat | null>(null);
 
   const [selectedActivity, setSelectedActivity] = useState("walking");
-  const [sliderValue, setSliderValue] = useState(3);
+  const [sliderValue, setSliderValue] = useState(6);
 
   const initializeMap = () => {
     if (mapboxAccessToken != null) {
@@ -38,9 +40,22 @@ export default function MapApp() {
 
   const handleMapClick = useCallback((e: mapboxgl.MapMouseEvent) => {
     if (!mapRef.current) return;
+    if (isSettingOrigin == null) return;
+
+    alert(`here: ${isSettingOrigin}`);
 
     setIsSettingOrigin(prev => {
-      return updateMarker(prev, e.lngLat);
+      if (prev != null) {
+        const isUpdateOriginMarker = updateMarker(prev, e.lngLat);
+        if (originMarkerRef.current == null || destinationMarkerRef.current == null) {
+          alert(`is update origin marker : ${isUpdateOriginMarker}`);
+          return isUpdateOriginMarker;
+        }
+      }
+
+      alert("null");
+
+      return null;
     });
   }, []);
 
@@ -85,32 +100,22 @@ export default function MapApp() {
 
   useEffect(() => {
     getRoute();
-  }, [originLabel, destinationLabel, sliderValue, selectedActivity]);
+  }, [originPoint, destinationPoint, sliderValue, selectedActivity]);
 
   const resetMarkers = () => {
     originMarkerRef.current?.remove();
     destinationMarkerRef.current?.remove();
     originMarkerRef.current = null;
     destinationMarkerRef.current = null;
-    setOriginLabel(markerToString(null));
-    setDestinationLabel(markerToString(null));
-    setIsSettingOrigin(true);
+    setOriginPoint(null);
+    setDestinationPoint(null);
+    setIsSettingOrigin(null);
     // removeRoute();
   };
 
-  function markerToString(markerRef: React.RefObject<mapboxgl.Marker> | null) {
-    const lngLat = markerRef?.current?.getLngLat();
-    if (!lngLat) {
-      return "Not Selected";
-    }
-
-    const { lng, lat } = lngLat;
-    return `${lng.toFixed(3)}, ${lat.toFixed(3)}`;
-  }
-
   const handleMarkerUpdate = () => {
-    setOriginLabel(markerToString(originMarkerRef));
-    setDestinationLabel(markerToString(destinationMarkerRef));
+    setOriginPoint(originMarkerRef.current?.getLngLat() ?? null);
+    setDestinationPoint(originMarkerRef.current?.getLngLat() ?? null);
   };
 
   async function getRoute() {
@@ -189,28 +194,63 @@ export default function MapApp() {
 
 
   return <>
-    <div className="grid py-2 gap-4 grid-flow-col">
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={resetMarkers}>Reset</button>
+    <div className="flex flex-col xl:flex-row w-full gap-4">
+      <div className="flex flex-col w-full xl:w-1/3 gap-4">
+        <div className="flex flex-col py-2 gap-4 xl:gap-8 lg:items-center">
 
-      <div className="grid py-2 gap-16 grid-flow-row">
-        <p>Origin: {originLabel}</p>
+          {/* Locations, Slider, and Transportation Mode Section */}
+          <div className="flex flex-col xl:flex-row justify-between items-center w-full xl:justify-center">
+            <div className="p-4 gap-8 sm:max-w-[450px] md:max-w-[1000px] w-full grid grid-flow-cols grid-cols-1 xl:w-auto border-2 rounded-xl">
+              <div className="border-b-4 pb-4">
+                <Locations
+                  isSettingOrigin={isSettingOrigin}
+                  originPoint={originPoint}
+                  destinationPoint={destinationPoint}
+                  onClickOrigin={() => setIsSettingOrigin(true)}
+                  onClickDestination={() => setIsSettingOrigin(false)}
+                />
+              </div>
+              <Slider value={sliderValue} onChange={handleSliderChange} />
+              <div className="w-full">
+                <TransportationMode
+                  setSelectedActivity={setSelectedActivity}
+                  selectedActivity={selectedActivity}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom row for Reset Button and Find Route Button */}
+          {false &&
+            <div className="flex xl:flex-row flex-col xl:justify-between xl:pt-4 pt-2 gap-4 w-full xs:flex-row xs:justify-between lg:px-8">
+              {/* Reset Button */}
+              <button
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                onClick={resetMarkers}
+              >
+                Reset
+              </button>
+
+              {/* Find Route Button */}
+              <button
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                onClick={getRoute}
+              >
+                Find Route
+              </button>
+            </div>
+          }
+        </div>
       </div>
 
-      <div className="grid py-2 gap-16 grid-flow-row">
-        <p>Destination: {destinationLabel}</p>
+      {/* Map Container */}
+      <div className="flex-1 xl:w-2/3">
+        <div
+          id="map-container"
+          className="rounded-md w-full h-[70vh] max-h-[1000px]"
+          ref={mapContainer}
+        />
       </div>
-
-      <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" onClick={getRoute}>Find Route</button>
-    </div>
-    < TransporationMode setSelectedActivity={setSelectedActivity} selectedActivity={selectedActivity} />
-    <div className="flex flex-col items-center gap-2 p-4">
-      <label htmlFor="slider" className="text-center text-gray-700">
-        Influence: {sliderValue}
-      </label>
-      <Slider value={sliderValue} onChange={handleSliderChange} />
-    </div>
-    <div className="shadow-three grid place-items-center pt-4">
-      <div id="map-container" className="rounded-md w-[100%] h-[500px]" ref={mapContainer} />
     </div>
   </>
 }
