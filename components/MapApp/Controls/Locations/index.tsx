@@ -12,20 +12,24 @@ interface LocationProps {
 const Locations: React.FC<LocationProps> = ({ isSettingOrigin, originPoint, destinationPoint, onClickOrigin, onClickDestination }) => {
     return (
         <>
-            <div className="flex flex-col gap-2 w-full xl:gap-4 md:flex-row md:gap-8">
-                <PointLabel
-                    point={originPoint}
-                    type={PointLabelType.origin}
-                    isSettingOrigin={isSettingOrigin}
-                    onClick={onClickOrigin}
-                />
+            <div className="flex flex-col gap-2 w-full xl:gap-4 md:flex-row md:gap-8 items-stretch">
+                <div className="flex-1">
+                    <PointLabel
+                        point={originPoint}
+                        type={PointLabelType.origin}
+                        isSettingOrigin={isSettingOrigin}
+                        onClick={onClickOrigin}
+                    />
+                </div>
 
-                <PointLabel
-                    point={destinationPoint}
-                    type={PointLabelType.destination}
-                    isSettingOrigin={isSettingOrigin}
-                    onClick={onClickDestination}
-                />
+                <div className="flex-1">
+                    <PointLabel
+                        point={destinationPoint}
+                        type={PointLabelType.destination}
+                        isSettingOrigin={isSettingOrigin}
+                        onClick={onClickDestination}
+                    />
+                </div>
             </div>
         </>
     );

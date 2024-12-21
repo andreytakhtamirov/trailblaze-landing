@@ -45,7 +45,9 @@ const PointLabel: React.FC<PointLabelProps> = ({ type, point, isSettingOrigin, o
 
     function markerToString(point: LngLat | null) {
         if (!point) {
-            return isActive() ? "Click on Map to Select" : "Click to change";
+            return isActive() ? "Click on map to select" : "Click to change";
+        } else if (isActive()) {
+            return "Click on map to change"
         }
 
         const { lng, lat } = point;
@@ -54,25 +56,29 @@ const PointLabel: React.FC<PointLabelProps> = ({ type, point, isSettingOrigin, o
 
     return (
         <>
-            <div className="flex flex-row xl:flex-col md:flex-row xs:flex-col justify-between w-full ">
-                <div className="flex flex-col lg:flex-row xl:flex-col sm:flex-col lg:gap-4 xl:gap-0">
-                    <p className="font-medium">{label()}</p>
+            <div className="flex flex-row xl:flex-col md:flex-row xs:flex-col w-full h-full">
+                <div className="flex flex-col lg:flex-row xl:flex-col sm:flex-col lg:gap-4 xl:gap-2 h-full justify-between w-full">
+                    <p className="font-medium flex-shrink-0 content-center">
+                        {label()}
+                    </p>
+
                     <div
-                        className={classNames("border-4", {
+                        className={classNames("border-2 rounded-lg flex-1 w-full", {
                             [`border-${colorForType()}`]: isActive(),
                         })}
                         onClick={onClick}
                     >
-
-                        <div className="px-4 w-full flex flex-row items-center gap-4 justify-between">
-                            <div className={classNames(`bg-${colorForType()} h-4 w-4 flex-shrink-0 rounded-full`)} />
-                            <span className="flex-grow">{markerToString(point)}</span>
+                        <div className="px-4 w-full flex flex-row items-center gap-4 justify-between h-full py-1">
+                            <div
+                                className={classNames(`bg-${colorForType()} h-4 w-4 flex-shrink-0 rounded-full`)}
+                            />
+                            <span className="flex-grow flex-shrink w-fit leading-5">{markerToString(point)}</span>
                             <MdOutlineEdit
                                 className={classNames("text-2xl", { "invisible": isActive() })}
                             />
                         </div>
                     </div>
-                </div >
+                </div>
             </div>
         </>
     );

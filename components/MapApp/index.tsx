@@ -15,7 +15,7 @@ export default function MapApp() {
   const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainer = useRef<HTMLDivElement | null>(null);
-  const [isSettingOrigin, setIsSettingOrigin] = useState<boolean | null>(null);
+  const [isSettingOrigin, setIsSettingOrigin] = useState<boolean | null>(true);
   const originMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const destinationMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
@@ -40,21 +40,14 @@ export default function MapApp() {
 
   const handleMapClick = useCallback((e: mapboxgl.MapMouseEvent) => {
     if (!mapRef.current) return;
-    if (isSettingOrigin == null) return;
-
-    alert(`here: ${isSettingOrigin}`);
 
     setIsSettingOrigin(prev => {
       if (prev != null) {
         const isUpdateOriginMarker = updateMarker(prev, e.lngLat);
         if (originMarkerRef.current == null || destinationMarkerRef.current == null) {
-          alert(`is update origin marker : ${isUpdateOriginMarker}`);
           return isUpdateOriginMarker;
         }
       }
-
-      alert("null");
-
       return null;
     });
   }, []);
@@ -102,52 +95,45 @@ export default function MapApp() {
     getRoute();
   }, [originPoint, destinationPoint, sliderValue, selectedActivity]);
 
-  const resetMarkers = () => {
-    originMarkerRef.current?.remove();
-    destinationMarkerRef.current?.remove();
-    originMarkerRef.current = null;
-    destinationMarkerRef.current = null;
-    setOriginPoint(null);
-    setDestinationPoint(null);
-    setIsSettingOrigin(null);
-    // removeRoute();
-  };
-
   const handleMarkerUpdate = () => {
     setOriginPoint(originMarkerRef.current?.getLngLat() ?? null);
-    setDestinationPoint(originMarkerRef.current?.getLngLat() ?? null);
+    setDestinationPoint(destinationMarkerRef.current?.getLngLat() ?? null);
   };
 
   async function getRoute() {
-    if (originMarkerRef.current == null || destinationMarkerRef.current == null) {
+    if (originPoint == null || destinationPoint == null || selectedActivity == null) {
       return;
     }
 
     const influence: number = 10 ** sliderValue;
 
-    console.log(influence);
-
-    const data = await fetchRoute(selectedActivity, [originMarkerRef.current!.getLngLat(), destinationMarkerRef.current!.getLngLat()], influence);
+    const data = await fetchRoute(selectedActivity, [originPoint, destinationPoint], influence);
 
     console.log(data);
+    await removeRoutes();
 
-    const maxIndex = data.paths.length - 1;
-    data.paths.reverse().forEach((path: { points: string; }, index: number) => {
+    const seen = new Set<string>();
+    data.paths = data.paths.filter((path: { points: string; }) => {
+      const serialized = JSON.stringify(decodeWithElevation(path.points).points);
+      if (seen.has(serialized)) {
+        return false;
+      }
+      seen.add(serialized);
+      return true;
+    });
+
+    data.paths.reverse().forEach((path: { points: string }, index: number) => {
       const points = path.points;
       const decoded = decodeWithElevation(points)
-      console.log(decoded);
-
-      displayRoute(decoded.points, index, maxIndex);
+      displayRoute(decoded.points, index, index == data.paths.length - 1);
     });
   }
 
 
-  function displayRoute(coordinates: GeoJSON.Position[], index: number, maxIndex: number) {
+  function displayRoute(coordinates: GeoJSON.Position[], index: number, isPrimary: boolean) {
     if (mapRef?.current == null) {
       return;
     }
-
-    removeRoute(index);
 
     mapRef.current.addSource(`route-${index}`, {
       "type": "geojson",
@@ -166,7 +152,7 @@ export default function MapApp() {
       'type': 'line',
       'source': `route-${index}`,
       'paint': {
-        'line-color': index == maxIndex ? '#FF0000' : '#808080',
+        'line-color': isPrimary ? '#FF0000' : '#808080',
         'line-width': 4,
       },
     });
@@ -174,17 +160,21 @@ export default function MapApp() {
     // mapRef.current.cameraForBounds()
   }
 
-  function removeRoute(index: number) {
+  async function removeRoutes(): Promise<void> {
     if (mapRef?.current == null) {
       return;
     }
 
-    if (mapRef.current.getLayer(`route-${index}`) != null) {
+    // Remove all layers and sources 1-n stopping at the first encountered null.
+    let index = 0;
+    let layer: any | null = mapRef.current.getLayer(`route-${index}`);
+    while (layer != null) {
       mapRef.current.removeLayer(`route-${index}`);
-    }
-
-    if (mapRef.current.getSource(`route-${index}`) != null) {
-      mapRef.current.removeSource(`route-${index}`);
+      if (mapRef.current.getSource(`route-${index}`) != null) {
+        mapRef.current.removeSource(`route-${index}`);
+      }
+      index++;
+      layer = mapRef.current.getLayer(`route-${index}`);
     }
   }
 
@@ -195,7 +185,7 @@ export default function MapApp() {
 
   return <>
     <div className="flex flex-col xl:flex-row w-full gap-4">
-      <div className="flex flex-col w-full xl:w-1/3 gap-4">
+      <div className="flex flex-col w-full xl:w-1/3 2xl:w-fit gap-4">
         <div className="flex flex-col py-2 gap-4 xl:gap-8 lg:items-center">
 
           {/* Locations, Slider, and Transportation Mode Section */}
@@ -206,8 +196,20 @@ export default function MapApp() {
                   isSettingOrigin={isSettingOrigin}
                   originPoint={originPoint}
                   destinationPoint={destinationPoint}
-                  onClickOrigin={() => setIsSettingOrigin(true)}
-                  onClickDestination={() => setIsSettingOrigin(false)}
+                  onClickOrigin={() => setIsSettingOrigin(prev => {
+                    if (prev === true) {
+                      return null;
+                    }
+
+                    return true;
+                  })}
+                  onClickDestination={() => setIsSettingOrigin(prev => {
+                    if (prev === false) {
+                      return null;
+                    }
+
+                    return false;
+                  })}
                 />
               </div>
               <Slider value={sliderValue} onChange={handleSliderChange} />
@@ -219,32 +221,11 @@ export default function MapApp() {
               </div>
             </div>
           </div>
-
-          {/* Bottom row for Reset Button and Find Route Button */}
-          {false &&
-            <div className="flex xl:flex-row flex-col xl:justify-between xl:pt-4 pt-2 gap-4 w-full xs:flex-row xs:justify-between lg:px-8">
-              {/* Reset Button */}
-              <button
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                onClick={resetMarkers}
-              >
-                Reset
-              </button>
-
-              {/* Find Route Button */}
-              <button
-                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                onClick={getRoute}
-              >
-                Find Route
-              </button>
-            </div>
-          }
         </div>
       </div>
 
       {/* Map Container */}
-      <div className="flex-1 xl:w-2/3">
+      <div className="flex-1 xl:w-2/3 2xl:w-fit">
         <div
           id="map-container"
           className="rounded-md w-full h-[70vh] max-h-[1000px]"
