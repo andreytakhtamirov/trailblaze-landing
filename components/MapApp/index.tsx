@@ -188,7 +188,7 @@ export default function MapApp() {
       return true;
     });
 
-    data.paths.forEach((path: { points: string }, index: number) => {
+    data.paths.reverse().forEach((path: { points: string }, index: number) => {
       const route = new Route(
         'route-' + index,
         'route-' + index,
