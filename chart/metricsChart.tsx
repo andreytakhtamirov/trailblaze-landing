@@ -43,6 +43,7 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ route, type }) => {
             x: {
                 stacked: true,
                 beginAtZero: true,
+                max: route.distance,
             },
             y: {
                 stacked: true,
@@ -64,7 +65,7 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ route, type }) => {
     };
 
 
-    return <div className="w-full h-20">
+    return <div className="w-full h-15">
         < Bar data={data} options={options} />
     </div >
 };
