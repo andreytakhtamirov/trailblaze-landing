@@ -4,11 +4,20 @@ import Slider from '@/components/MapApp/Controls/Slider';
 import TransportationMode from '@/components/MapApp/Controls/TransportationMode';
 import Locations from '@/components/MapApp/Controls/Locations'
 import { fetchRoute } from '@/requests/fetchRoute';
-import { decodeWithElevation } from '@/util/polylineDecode';
 import mapboxgl, { LngLat } from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Route } from '@/types/route';
+import { decodeWithElevation } from '@/util/polylineDecode';
+import Metrics from './Details/Metrics';
+import { PolylineUtil } from '@/util/polyline';
+import { MetricType } from '@/chart/metricsChart';
+import { FormatHelper } from '@/util/formatHelper';
 
+interface SelectedMetricState {
+  metric: string | null;
+  metricType: MetricType | null;
+}
 
 export default function MapApp() {
 
@@ -25,6 +34,13 @@ export default function MapApp() {
   const [selectedActivity, setSelectedActivity] = useState("walking");
   const [sliderValue, setSliderValue] = useState(6);
 
+  const [routes, setRoutes] = useState<Array<Route> | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
+  const [selectedMetric, setSelectedMetric] = useState<SelectedMetricState>({
+    metric: null,
+    metricType: null,
+  });
+
   const initializeMap = () => {
     if (mapboxAccessToken != null) {
       mapboxgl.accessToken = mapboxAccessToken;
@@ -37,6 +53,69 @@ export default function MapApp() {
       zoom: 10
     });
   };
+
+  const handleResize = () => {
+    if (mapRef.current) {
+      mapRef.current.resize();
+    }
+  };
+
+  useEffect(() => {
+    mapRef.current = initializeMap();
+    mapRef.current.on('click', handleMapClick);
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      mapRef.current?.off('click', handleMapClick);
+      mapRef.current?.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    getRoute();
+  }, [originPoint, destinationPoint, sliderValue, selectedActivity]);
+
+  useEffect(() => {
+    handleResize();
+  }, [selectedRoute]);
+
+  useEffect(() => {
+    if (routes == null || routes.length === 0) {
+      return;
+    }
+
+    const updateRoutes = async () => {
+      await removeRoutes();
+
+      setSelectedRoute(routes[routes.length - 1]);
+
+      for (let route of routes) {
+        displayRoute(route);
+      }
+    };
+
+    updateRoutes();
+  }, [routes]);
+
+  useEffect(() => {
+    const showMetric = async () => {
+      if (mapRef.current == null || selectedMetric.metricType == null || selectedMetric.metric == null || selectedRoute == null) {
+        return;
+      }
+
+      await removeMapMetrics();
+
+      const metric = selectedMetric.metricType === MetricType.surface ? selectedRoute.surfacePolylines : selectedRoute.roadClassPolylines;
+      const lineLayer = PolylineUtil.getLineLayer('metric', 'metric', "#FFFFFF", { isMetric: true });
+      const source = PolylineUtil.getMultiLineSource(metric[selectedMetric.metric]);
+      mapRef.current.addSource('metric', source);
+      mapRef.current.addLayer(lineLayer);
+    };
+
+    showMetric();
+  }, [selectedMetric]);
 
   const handleMapClick = useCallback((e: mapboxgl.MapMouseEvent) => {
     if (!mapRef.current) return;
@@ -81,20 +160,6 @@ export default function MapApp() {
     updateMarker(false, destinationMarkerRef.current!.getLngLat());
   }
 
-  useEffect(() => {
-    mapRef.current = initializeMap();
-    mapRef.current.on('click', handleMapClick);
-
-    return () => {
-      mapRef.current?.off('click', handleMapClick);
-      mapRef.current?.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    getRoute();
-  }, [originPoint, destinationPoint, sliderValue, selectedActivity]);
-
   const handleMarkerUpdate = () => {
     setOriginPoint(originMarkerRef.current?.getLngLat() ?? null);
     setDestinationPoint(destinationMarkerRef.current?.getLngLat() ?? null);
@@ -110,7 +175,8 @@ export default function MapApp() {
     const data = await fetchRoute(selectedActivity, [originPoint, destinationPoint], influence);
 
     console.log(data);
-    await removeRoutes();
+
+    const newRoutes: Array<Route> = [];
 
     const seen = new Set<string>();
     data.paths = data.paths.filter((path: { points: string; }) => {
@@ -122,48 +188,37 @@ export default function MapApp() {
       return true;
     });
 
-    data.paths.reverse().forEach((path: { points: string }, index: number) => {
-      const points = path.points;
-      const decoded = decodeWithElevation(points)
-      displayRoute(decoded.points, index, index == data.paths.length - 1);
+    data.paths.forEach((path: { points: string }, index: number) => {
+      const route = new Route(
+        'route-' + index,
+        'route-' + index,
+        path,
+        index === 0,
+      );
+
+      newRoutes.push(route);
     });
+
+    setRoutes(newRoutes.reverse());
   }
 
-
-  function displayRoute(coordinates: GeoJSON.Position[], index: number, isPrimary: boolean) {
+  function displayRoute(route: Route) {
     if (mapRef?.current == null) {
       return;
     }
 
-    mapRef.current.addSource(`route-${index}`, {
-      "type": "geojson",
-      "data": {
-        "type": "Feature",
-        "properties": {},
-        "geometry": {
-          "type": "LineString",
-          "coordinates": coordinates
-        },
-      },
-    });
-
-    mapRef.current.addLayer({
-      'id': `route-${index}`,
-      'type': 'line',
-      'source': `route-${index}`,
-      'paint': {
-        'line-color': isPrimary ? '#FF0000' : '#808080',
-        'line-width': 4,
-      },
-    });
-
-    // mapRef.current.cameraForBounds()
+    mapRef.current.addSource(route.sourceId, route.sourceLayer);
+    mapRef.current.addLayer(route.lineLayer);
   }
 
   async function removeRoutes(): Promise<void> {
+    setSelectedRoute(null);
+    setSelectedMetric({ metric: null, metricType: null });
     if (mapRef?.current == null) {
       return;
     }
+
+    await removeMapMetrics();
 
     // Remove all layers and sources 1-n stopping at the first encountered null.
     let index = 0;
@@ -178,6 +233,20 @@ export default function MapApp() {
     }
   }
 
+  async function removeMapMetrics() {
+    if (mapRef?.current == null) {
+      return;
+    }
+
+    if (mapRef.current.getLayer('metric')) {
+      mapRef.current.removeLayer('metric');
+    }
+
+    if (mapRef.current.getSource('metric')) {
+      mapRef.current.removeSource('metric');
+    }
+  }
+
   const handleSliderChange = (newValue: number) => {
     setSliderValue(newValue);
   };
@@ -186,11 +255,11 @@ export default function MapApp() {
   return <>
     <div className="flex flex-col xl:flex-row w-full gap-4">
       <div className="flex flex-col w-full xl:w-1/3 2xl:w-fit gap-4">
-        <div className="flex flex-col py-2 gap-4 xl:gap-8 lg:items-center">
+        <div className="flex flex-col py-2 gap-4 xl:gap-4 lg:items-center">
 
           {/* Locations, Slider, and Transportation Mode Section */}
           <div className="flex flex-col xl:flex-row justify-between items-center w-full xl:justify-center">
-            <div className="p-4 gap-8 sm:max-w-[450px] md:max-w-[1000px] w-full grid grid-flow-cols grid-cols-1 xl:w-auto border-2 rounded-xl">
+            <div className="p-4 gap-8 w-full grid grid-flow-cols grid-cols-1 xl:w-auto border-2 rounded-xl">
               <div className="border-b-4 pb-4">
                 <Locations
                   isSettingOrigin={isSettingOrigin}
@@ -221,16 +290,55 @@ export default function MapApp() {
               </div>
             </div>
           </div>
+          {selectedRoute != null &&
+            <div className="flex flex-col xl:flex-row justify-between items-center w-full xl:justify-center">
+              <div className="p-4 gap-2 xl:max-w-[516px] w-full grid grid-flow-cols grid-cols-1 xl:w-auto border-2 rounded-xl">
+                <div className="text-lg font-bold">
+                  Route Info
+                </div>
+                <div className="grid grid-flow-col grid-cols-2 mx-2">
+                  <div className="sm:max-w-[450px] md:max-w-[1000px]">
+                    {selectedRoute != null && <Metrics route={selectedRoute!} type={MetricType.surface} selectedMetric={selectedMetric.metric} onMetricSelect={(metric: string) => {
+                      setSelectedMetric({ metricType: MetricType.surface, metric: metric });
+                    }} />}
+                  </div>
+                  <div className="sm:max-w-[450px] md:max-w-[1000px]">
+                    {selectedRoute != null && <Metrics route={selectedRoute!} type={MetricType.roadClass} selectedMetric={selectedMetric.metric} onMetricSelect={(metric: string) => {
+                      setSelectedMetric({ metricType: MetricType.roadClass, metric: metric });
+                    }} />}
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
         </div>
       </div>
 
-      {/* Map Container */}
-      <div className="flex-1 xl:w-2/3 2xl:w-fit">
+      <div className="flex-1 xl:w-2/3 2xl:w-fit relative">
+        {/* Map Container */}
         <div
           id="map-container"
-          className="rounded-md w-full h-[70vh] max-h-[1000px]"
+          className="rounded-md w-full xs:h-[50vh] sm:h-[50vh] md:min-h-full relative"
           ref={mapContainer}
-        />
+        >
+          {/* Route Info Overlay */}
+          {selectedRoute && (
+            <div
+              className="absolute top-4 left-4 pointer-events-none"
+            >
+              <div
+                className="bg-white bg-opacity-90 p-4 rounded-md shadow-md text-left pointer-events-auto"
+              >
+                <div className="text-md font-medium">
+                  Distance: {FormatHelper.formatDistancePrecise(selectedRoute.distance, false, true)}
+                </div>
+                <div className="text-md font-medium">
+                  Duration: {FormatHelper.formatDuration(selectedRoute.duration)}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   </>

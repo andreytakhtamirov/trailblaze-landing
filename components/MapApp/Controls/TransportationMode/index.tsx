@@ -23,8 +23,8 @@ const TransportationMode: React.FC<{
                                 onChange={() => setSelectedActivity(activity)}
                                 className="hidden peer"
                             />
-                            <span className="w-full text-center bg-gray-500 peer-checked:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center space-x-2 flex-grow">
-                                <span className="text-2xl">{activityIcons[index]}</span>
+                            <span className="w-full text-center bg-gray-500 peer-checked:bg-green-700 text-white font-medium text-xs py-2 px-4 rounded flex items-center justify-center space-x-2 flex-grow">
+                                <span className="text-xl">{activityIcons[index]}</span>
                                 <span className="text-center  flex-shrink">{activityLabels[index]}</span>
                             </span>
                         </label>

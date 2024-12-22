@@ -1,17 +1,4 @@
-interface CoordinatesWithElevation {
-    points: Array<GeoJSON.Position>;
-    elevations: number[];
-}
-
-class CoordinatesWithElevation {
-    points: Array<GeoJSON.Position> = [];
-    elevations: number[] = [];
-
-    addPoint(coords: [number, number], elevation: number): void {
-        this.points.push([coords[1], coords[0]]);
-        this.elevations.push(elevation);
-    }
-}
+import { CoordinatesWithElevation } from "@/types/coordinatesWithElevation";
 
 // Expanded on https://github.com/mapbox/polyline/blob/master/src/polyline.js to include decoding `elevation`.
 export function decodeWithElevation(str: string, precision: number = 5): CoordinatesWithElevation {
