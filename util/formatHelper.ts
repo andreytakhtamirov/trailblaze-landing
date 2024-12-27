@@ -76,4 +76,22 @@ export abstract class FormatHelper {
             return `${distanceMiles.toFixed(noRemainder ? 0 : 2)} mi`;
         }
     }
+
+    public static toCapitalizedText(s: string): string {
+        const words = s.split('_');
+        let capitalizedText = '';
+
+        for (let i = 0; i < words.length; i++) {
+            const word = words[i];
+            if (word.length > 0) {
+                const capitalizedWord = `${word[0].toUpperCase()}${word.substring(1)}`;
+                capitalizedText += capitalizedWord;
+                if (i < words.length - 1) {
+                    capitalizedText += ' ';
+                }
+            }
+        }
+
+        return capitalizedText;
+    }
 }

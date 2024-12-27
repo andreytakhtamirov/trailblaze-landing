@@ -56,9 +56,9 @@ const PointLabel: React.FC<PointLabelProps> = ({ type, point, isSettingOrigin, o
 
     return (
         <>
-            <div className="flex flex-row xl:flex-col md:flex-row xs:flex-col w-full h-full">
-                <div className="flex flex-col lg:flex-row xl:flex-col sm:flex-col lg:gap-4 xl:gap-2 h-full justify-between w-full">
-                    <p className="font-medium flex-shrink-0 content-center">
+            <div className="flex flex-col w-full h-full">
+                <div className="flex flex-col lg:grid lg:grid-flow-cols lg:grid-cols-2 gap-2 xs:gap-0.5 h-full justify-between w-full">
+                    <p className="font-medium hidden sm:block flex-shrink-0 content-center">
                         {label()}
                     </p>
 
@@ -68,7 +68,7 @@ const PointLabel: React.FC<PointLabelProps> = ({ type, point, isSettingOrigin, o
                         })}
                         onClick={onClick}
                     >
-                        <div className="px-4 w-full flex flex-row items-center gap-4 justify-between h-full py-1">
+                        <div className="px-4 w-full flex flex-row items-center gap-4 justify-between h-full py-0.5 sm:py-1">
                             <div
                                 className={classNames(`bg-${colorForType()} h-4 w-4 flex-shrink-0 rounded-full`)}
                             />

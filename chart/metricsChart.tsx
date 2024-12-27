@@ -7,6 +7,7 @@ import { kChartPalette1, kChartPalette2 } from "./colors";
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export enum MetricType {
+    elevation,
     surface,
     roadClass,
 }

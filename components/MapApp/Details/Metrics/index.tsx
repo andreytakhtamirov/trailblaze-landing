@@ -1,88 +1,63 @@
-import { kChartPalette1, kChartPalette2 } from "@/chart/colors";
-import MetricsChart, { MetricType } from "@/chart/metricsChart";
-import { Route } from "@/types/route"
-import { FormatHelper } from "@/util/formatHelper";
-import { useState } from "react";
+import { MetricType } from "@/chart/metricsChart";
+import Dropdown from "../../Controls/Dropdown";
+import { Route } from "@/types/route";
+import ChartMetric from "./ChartMetric";
+import { MdOutlineArrowBackIos } from "react-icons/md";
+import MetricBarView from "./MetricBarView";
 
 interface MetricsProps {
     route: Route;
-    onMetricSelect: (selectedMetric: string) => void;
+    selectedMetricType: MetricType | null;
     selectedMetric: string | null;
-    type: MetricType;
+    onMetricChange: (metricType: MetricType | null, metric: string | null) => void;
 }
 
-const Metrics: React.FC<MetricsProps> = ({ route, onMetricSelect, selectedMetric, type }) => {
-    const title = type === MetricType.surface ? "Surface" : "Road Class";
-    const metrics = type === MetricType.surface ? route.surfaceMetrics : route.roadClassMetrics;
-    const [expanded, setExpanded] = useState(false);
+const Metrics: React.FC<MetricsProps> = ({ route, selectedMetricType, selectedMetric, onMetricChange }) => {
+    function getViewForOption() {
+        switch (selectedMetricType) {
+            case MetricType.elevation:
+                return (<ChartMetric route={route} type={MetricType.surface} selectedMetric={selectedMetric} onMetricSelect={(metric: string) => {
+                    onMetricChange(MetricType.surface, metric);
+                }} />);
+            case MetricType.surface:
+                return (<ChartMetric route={route} type={MetricType.surface} selectedMetric={selectedMetric} onMetricSelect={(metric: string) => {
+                    onMetricChange(MetricType.surface, metric);
+                }} />);
+            case MetricType.roadClass:
+                return (<ChartMetric route={route} type={MetricType.roadClass} selectedMetric={selectedMetric} onMetricSelect={(metric: string) => {
+                    onMetricChange(MetricType.roadClass, metric);
+                }} />);
+        }
+    }
 
-    const handleToggleExpand = () => {
-        setExpanded(!expanded);
-    };
+    return (<>
+        {selectedMetricType != null &&
+            <div className="text-xl flex flex-row items-center justify-between">
 
-    return (
-        <>
-            <div className="flex flex-wrap gap-2">
-                <div className="text-md font-semibold">
-                    {title}
+                <div className="flex flex-row items-center text-blue-500" onClick={() => {
+                    onMetricChange(null, null);
+                }}>
+                    <MdOutlineArrowBackIos />
+                    Summary
                 </div>
-                <div className="w-full">
-                    <MetricsChart route={route} type={type} />
+
+                <Dropdown metricType={selectedMetricType} onSelect={(metricType: MetricType) => { onMetricChange(metricType, selectedMetric) }} />
+            </div>
+        }
+        {selectedMetricType === null &&
+            <div className="grid grid-flow-col grid-cols-2 mx-2">
+                <div className="sm:max-w-[450px] md:max-w-[1000px] border-r-2">
+                    <MetricBarView route={route} type={MetricType.surface} onPreviewMetricType={() => onMetricChange(MetricType.surface, null)
+                    } />
                 </div>
-
-                {Object.entries(metrics).slice(0, expanded ? metrics.size : 3).map(([key, value], index) => {
-                    const colorPalette = type === MetricType.surface ? kChartPalette1 : kChartPalette2;
-                    const accentColor = colorPalette[index % colorPalette.length];
-                    const isSelected = selectedMetric === key;
-
-                    return (
-                        <div key={key}>
-                            <label className="metric-item flex items-center cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="metric"
-                                    value={key}
-                                    checked={isSelected}
-                                    onChange={() => onMetricSelect(key)}
-                                    className="peer hidden"
-                                />
-                                <div
-                                    className={`flex items-center gap-2 px-4 border rounded-full bg-gray-100 h-12 xl:w-40`}
-                                    style={{
-                                        borderColor: isSelected ? accentColor : "transparent",
-                                        borderWidth: "3px",
-                                    }}
-                                >
-                                    <span
-                                        className="w-3 h-3 rounded-full"
-                                        style={{ backgroundColor: accentColor }}
-                                    ></span>
-                                    <div>
-                                        <span className="text-sm font-medium">{key}</span>
-                                        {isSelected && (
-                                            <div className="text-sm font-medium">
-                                                {FormatHelper.formatDistancePrecise(value, false, true)}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                    );
-                })}
+                <div className="sm:max-w-[450px] md:max-w-[1000px]">
+                    <MetricBarView route={route} type={MetricType.roadClass} onPreviewMetricType={() => onMetricChange(MetricType.roadClass, null)
+                    } />
+                </div>
             </div>
-            <div className="text-center">
-                {Object.entries(metrics).length > 3 && (
-                    <button
-                        onClick={handleToggleExpand}
-                        className="mt-4 text-blue-500"
-                    >
-                        {expanded ? 'Show less' : 'Show more'}
-                    </button>
-                )}
-            </div>
-        </>
-    );
+        }
+        {getViewForOption()}
+    </>);
 };
 
 export default Metrics;

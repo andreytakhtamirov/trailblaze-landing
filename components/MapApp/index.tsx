@@ -24,6 +24,7 @@ export default function MapApp() {
   const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainer = useRef<HTMLDivElement | null>(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isSettingOrigin, setIsSettingOrigin] = useState<boolean | null>(true);
   const originMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const destinationMarkerRef = useRef<mapboxgl.Marker | null>(null);
@@ -65,6 +66,7 @@ export default function MapApp() {
     mapRef.current.on('click', handleMapClick);
 
     window.addEventListener("resize", handleResize);
+    setIsMapLoaded(true);
 
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -253,93 +255,80 @@ export default function MapApp() {
 
 
   return <>
-    <div className="flex flex-col xl:flex-row w-full gap-4">
-      <div className="flex flex-col w-full xl:w-1/3 2xl:w-fit gap-4">
-        <div className="flex flex-col py-2 gap-4 xl:gap-4 lg:items-center">
+    <div className="w-full h-full relative">
+      {/* Map Container */}
+      <div
+        id="map-container"
+        className="rounded-md w-full h-[100dvh] relative pb-safe"
+        ref={mapContainer}
+      >
+        {isMapLoaded && selectedMetric.metricType == null &&
+          <div className="absolute top-4 right-4 left-4 sm:left-auto pointer-events-none">
+            <div className="bg-white bg-opacity-90 px-3 py-3 rounded-xl shadow-md text-left pointer-events-auto lg:min-w-[500px]">
 
-          {/* Locations, Slider, and Transportation Mode Section */}
-          <div className="flex flex-col xl:flex-row justify-between items-center w-full xl:justify-center">
-            <div className="p-4 gap-8 w-full grid grid-flow-cols grid-cols-1 xl:w-auto border-2 rounded-xl">
-              <div className="border-b-4 pb-4">
-                <Locations
-                  isSettingOrigin={isSettingOrigin}
-                  originPoint={originPoint}
-                  destinationPoint={destinationPoint}
-                  onClickOrigin={() => setIsSettingOrigin(prev => {
-                    if (prev === true) {
-                      return null;
-                    }
+              {/* Locations, Slider, and Transportation Mode Section */}
+              <div className="gap-2 sm:gap-4 w-full grid grid-flow-cols grid-cols-1 xl:w-auto rounded-xl">
+                <div className="border-b-2 sm:border-b-4 pb-2 sm:pb-4">
+                  <Locations
+                    isSettingOrigin={isSettingOrigin}
+                    originPoint={originPoint}
+                    destinationPoint={destinationPoint}
+                    onClickOrigin={() => setIsSettingOrigin(prev => {
+                      if (prev === true) {
+                        return null;
+                      }
 
-                    return true;
-                  })}
-                  onClickDestination={() => setIsSettingOrigin(prev => {
-                    if (prev === false) {
-                      return null;
-                    }
+                      return true;
+                    })}
+                    onClickDestination={() => setIsSettingOrigin(prev => {
+                      if (prev === false) {
+                        return null;
+                      }
 
-                    return false;
-                  })}
-                />
-              </div>
-              <Slider value={sliderValue} onChange={handleSliderChange} />
-              <div className="w-full">
-                <TransportationMode
-                  setSelectedActivity={setSelectedActivity}
-                  selectedActivity={selectedActivity}
-                />
+                      return false;
+                    })}
+                  />
+                </div>
+                <Slider value={sliderValue} onChange={handleSliderChange} />
+                <div className="w-full">
+                  <TransportationMode
+                    setSelectedActivity={setSelectedActivity}
+                    selectedActivity={selectedActivity}
+                  />
+                </div>
               </div>
             </div>
           </div>
-          {selectedRoute != null &&
-            <div className="flex flex-col xl:flex-row justify-between items-center w-full xl:justify-center">
-              <div className="p-4 gap-2 xl:max-w-[516px] w-full grid grid-flow-cols grid-cols-1 xl:w-auto border-2 rounded-xl">
-                <div className="text-lg font-bold">
-                  Route Info
-                </div>
-                <div className="grid grid-flow-col grid-cols-2 mx-2">
-                  <div className="sm:max-w-[450px] md:max-w-[1000px]">
-                    {selectedRoute != null && <Metrics route={selectedRoute!} type={MetricType.surface} selectedMetric={selectedMetric.metric} onMetricSelect={(metric: string) => {
-                      setSelectedMetric({ metricType: MetricType.surface, metric: metric });
-                    }} />}
-                  </div>
-                  <div className="sm:max-w-[450px] md:max-w-[1000px]">
-                    {selectedRoute != null && <Metrics route={selectedRoute!} type={MetricType.roadClass} selectedMetric={selectedMetric.metric} onMetricSelect={(metric: string) => {
-                      setSelectedMetric({ metricType: MetricType.roadClass, metric: metric });
-                    }} />}
-                  </div>
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-      </div>
+        }
 
-      <div className="flex-1 xl:w-2/3 2xl:w-fit relative">
-        {/* Map Container */}
-        <div
-          id="map-container"
-          className="rounded-md w-full xs:h-[50vh] sm:h-[50vh] md:min-h-full relative"
-          ref={mapContainer}
-        >
-          {/* Route Info Overlay */}
-          {selectedRoute && (
-            <div
-              className="absolute top-4 left-4 pointer-events-none"
-            >
-              <div
-                className="bg-white bg-opacity-90 p-4 rounded-md shadow-md text-left pointer-events-auto"
-              >
-                <div className="text-md font-medium">
-                  Distance: {FormatHelper.formatDistancePrecise(selectedRoute.distance, false, true)}
-                </div>
-                <div className="text-md font-medium">
-                  Duration: {FormatHelper.formatDuration(selectedRoute.duration)}
+        {/* Route Info Overlay */}
+        {selectedRoute != null &&
+          <div className="absolute bottom-4 right-4 left-4 sm:left-auto pointer-events-none">
+            <div className="bg-white bg-opacity-90 p-4 rounded-xl shadow-md text-left pointer-events-auto">
+              <div className="flex flex-col xl:flex-row justify-between items-center w-full xl:justify-center">
+                <div className="gap-2 max-w-[600px] lg:min-w-[500px] sm:min-w-[400px] w-full grid grid-flow-cols grid-cols-1 max-h-[400px]">
+                  {selectedMetric.metricType == null && < div >
+                    <div className="text-lg font-bold text-black text-center">
+                      Route Info
+                    </div>
+                    <div
+                      className="mx-4 text-base font-medium"
+                    >
+                      <div>
+                        Distance: {FormatHelper.formatDistancePrecise(selectedRoute.distance, false, true)}
+                      </div>
+                      <div>
+                        Duration: {FormatHelper.formatDuration(selectedRoute.duration)}
+                      </div>
+                    </div>
+                  </div>}
+                  <Metrics route={selectedRoute!} selectedMetricType={selectedMetric.metricType} selectedMetric={selectedMetric.metric} onMetricChange={(type: MetricType, metric: string) => { setSelectedMetric({ metricType: type, metric: metric }) }} />
                 </div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        }
       </div>
-    </div>
+    </div >
   </>
 }
