@@ -11,7 +11,10 @@ on:
 
 jobs:
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
@@ -36,6 +39,8 @@ jobs:
           touch .env
           echo ASSET_HOST=${{ secrets.ASSET_HOST }} >> .env
           echo CDN_ADDRESS=${{ secrets.CDN_ADDRESS }} >> .env
+          echo NEXT_PUBLIC_APP_TOKEN=${{ secrets.NEXT_PUBLIC_APP_TOKEN }} >> .env
+          echo NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }} >> .env
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
