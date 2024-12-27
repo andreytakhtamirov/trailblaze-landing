@@ -262,8 +262,11 @@ export default function MapApp() {
         className="rounded-md w-full h-[100dvh] relative pb-safe"
         ref={mapContainer}
       >
-        {isMapLoaded && selectedMetric.metricType == null &&
-          <div className="absolute top-4 right-4 left-4 sm:left-auto pointer-events-none">
+        {isMapLoaded &&
+          <div className={`
+            absolute top-4 right-4 left-4 sm:left-auto pointer-events-none 
+            ${selectedMetric.metricType != null ? 'sm:block xs:hidden' : 'sm:block xs:block'}
+          `}>
             <div className="bg-white bg-opacity-90 px-3 py-3 rounded-xl shadow-md text-left pointer-events-auto lg:min-w-[500px]">
 
               {/* Locations, Slider, and Transportation Mode Section */}
@@ -305,25 +308,23 @@ export default function MapApp() {
         {selectedRoute != null &&
           <div className="absolute bottom-4 right-4 left-4 sm:left-auto pointer-events-none">
             <div className="bg-white bg-opacity-90 p-4 rounded-xl shadow-md text-left pointer-events-auto">
-              <div className="flex flex-col xl:flex-row justify-between items-center w-full xl:justify-center">
-                <div className="gap-2 max-w-[600px] lg:min-w-[500px] sm:min-w-[400px] w-full grid grid-flow-cols grid-cols-1 max-h-[400px]">
-                  {selectedMetric.metricType == null && < div >
-                    <div className="text-lg font-bold text-black text-center">
-                      Route Info
+              <div className="gap-2 max-w-[600px] lg:min-w-[500px] sm:min-w-[400px] w-full grid grid-flow-cols grid-cols-1 max-h-[400px]">
+                {selectedMetric.metricType == null && < div >
+                  <div className="text-lg font-bold text-black text-center">
+                    Route Info
+                  </div>
+                  <div
+                    className="mx-4 text-base font-medium"
+                  >
+                    <div>
+                      Distance: {FormatHelper.formatDistancePrecise(selectedRoute.distance, false, true)}
                     </div>
-                    <div
-                      className="mx-4 text-base font-medium"
-                    >
-                      <div>
-                        Distance: {FormatHelper.formatDistancePrecise(selectedRoute.distance, false, true)}
-                      </div>
-                      <div>
-                        Duration: {FormatHelper.formatDuration(selectedRoute.duration)}
-                      </div>
+                    <div>
+                      Duration: {FormatHelper.formatDuration(selectedRoute.duration)}
                     </div>
-                  </div>}
-                  <Metrics route={selectedRoute!} selectedMetricType={selectedMetric.metricType} selectedMetric={selectedMetric.metric} onMetricChange={(type: MetricType, metric: string) => { setSelectedMetric({ metricType: type, metric: metric }) }} />
-                </div>
+                  </div>
+                </div>}
+                <Metrics route={selectedRoute!} selectedMetricType={selectedMetric.metricType} selectedMetric={selectedMetric.metric} onMetricChange={(type: MetricType, metric: string) => { setSelectedMetric({ metricType: type, metric: metric }) }} />
               </div>
             </div>
           </div>

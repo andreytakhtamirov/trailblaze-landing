@@ -18,7 +18,7 @@ const getColorForIndex = (index: number, type: MetricType): string => {
 
 const MetricBarView: React.FC<MetricBarViewProps> = ({ route, type, onPreviewMetricType }) => {
     const title = type === MetricType.surface ? "Surface" : "Road Class";
-    const metrics = MetricType.surface ? route.surfaceMetrics : route.elevationMetrics;
+    const metrics = type === MetricType.surface ? route.surfaceMetrics : route.roadClassMetrics;
     const maxItems = 3;
 
     return (
