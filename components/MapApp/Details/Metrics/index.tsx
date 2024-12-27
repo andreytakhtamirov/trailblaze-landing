@@ -4,6 +4,7 @@ import { Route } from "@/types/route";
 import ChartMetric from "./ChartMetric";
 import { MdOutlineArrowBackIos } from "react-icons/md";
 import MetricBarView from "./MetricBarView";
+import ElevationChart from "@/chart/elevationChart";
 
 interface MetricsProps {
     route: Route;
@@ -16,9 +17,7 @@ const Metrics: React.FC<MetricsProps> = ({ route, selectedMetricType, selectedMe
     function getViewForOption() {
         switch (selectedMetricType) {
             case MetricType.elevation:
-                return (<ChartMetric route={route} type={MetricType.surface} selectedMetric={selectedMetric} onMetricSelect={(metric: string) => {
-                    onMetricChange(MetricType.surface, metric);
-                }} />);
+                return (<ElevationChart route={route} />);
             case MetricType.surface:
                 return (<ChartMetric route={route} type={MetricType.surface} selectedMetric={selectedMetric} onMetricSelect={(metric: string) => {
                     onMetricChange(MetricType.surface, metric);
@@ -41,22 +40,27 @@ const Metrics: React.FC<MetricsProps> = ({ route, selectedMetricType, selectedMe
                     Summary
                 </div>
 
-                <Dropdown metricType={selectedMetricType} onSelect={(metricType: MetricType) => { onMetricChange(metricType, selectedMetric) }} />
+                <Dropdown metricType={selectedMetricType} onSelect={(metricType: MetricType) => { onMetricChange(metricType, null) }} />
             </div>
         }
         {selectedMetricType === null &&
-            <div className="grid grid-flow-col grid-cols-2 mx-2">
-                <div className="sm:max-w-[450px] md:max-w-[1000px] border-r-2">
-                    <MetricBarView route={route} type={MetricType.surface} onPreviewMetricType={() => onMetricChange(MetricType.surface, null)
-                    } />
-                </div>
-                <div className="sm:max-w-[450px] md:max-w-[1000px]">
-                    <MetricBarView route={route} type={MetricType.roadClass} onPreviewMetricType={() => onMetricChange(MetricType.roadClass, null)
-                    } />
+            <div className="overflow-scroll max-h-[200px] sm:max-h-none sm:overflow-auto">
+                <ElevationChart route={route} />
+                <div className="grid grid-flow-col grid-cols-2 mx-2">
+                    <div className="sm:max-w-[450px] md:max-w-[1000px] border-r-2">
+                        <MetricBarView route={route} type={MetricType.surface} onPreviewMetricType={() => onMetricChange(MetricType.surface, null)
+                        } />
+                    </div>
+                    <div className="sm:max-w-[450px] md:max-w-[1000px]">
+                        <MetricBarView route={route} type={MetricType.roadClass} onPreviewMetricType={() => onMetricChange(MetricType.roadClass, null)
+                        } />
+                    </div>
                 </div>
             </div>
         }
-        {getViewForOption()}
+        <div className="overflow-clip">
+            {getViewForOption()}
+        </div>
     </>);
 };
 

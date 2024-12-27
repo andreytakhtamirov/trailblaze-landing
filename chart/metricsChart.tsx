@@ -3,6 +3,7 @@ import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { Route } from "@/types/route";
 import { kChartPalette1, kChartPalette2 } from "./colors";
+import { FormatHelper } from "@/util/formatHelper";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -45,6 +46,11 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ route, type }) => {
                 stacked: true,
                 beginAtZero: true,
                 max: route.distance,
+                ticks: {
+                    callback: (value: number) => {
+                        return FormatHelper.formatDistance(value, false, true);
+                    }
+                }
             },
             y: {
                 stacked: true,
@@ -61,14 +67,22 @@ const MetricsChart: React.FC<MetricsChartProps> = ({ route, type }) => {
             legend: {
                 display: false,
             },
+            tooltip: {
+                callbacks: {
+                    label: (tooltipItem: any) => {
+                        const dataset = tooltipItem.dataset;
+                        const value = dataset.data[tooltipItem.dataIndex];
+                        return `${FormatHelper.toCapitalizedText(dataset.label)}: ${FormatHelper.formatDistance(value, false, true)}`;
+                    }
+                }
+            }
         },
         maintainAspectRatio: false,
     };
 
-
     return <div className="w-full h-15">
-        < Bar data={data} options={options} />
-    </div >
+        <Bar data={data} options={options} />
+    </div>
 };
 
 export default MetricsChart;

@@ -13,6 +13,7 @@ import Metrics from './Details/Metrics';
 import { PolylineUtil } from '@/util/polyline';
 import { MetricType } from '@/chart/metricsChart';
 import { FormatHelper } from '@/util/formatHelper';
+import ElevationChart from '@/chart/elevationChart';
 
 interface SelectedMetricState {
   metric: string | null;
@@ -103,11 +104,11 @@ export default function MapApp() {
 
   useEffect(() => {
     const showMetric = async () => {
+      await removeMapMetrics();
+
       if (mapRef.current == null || selectedMetric.metricType == null || selectedMetric.metric == null || selectedRoute == null) {
         return;
       }
-
-      await removeMapMetrics();
 
       const metric = selectedMetric.metricType === MetricType.surface ? selectedRoute.surfacePolylines : selectedRoute.roadClassPolylines;
       const lineLayer = PolylineUtil.getLineLayer('metric', 'metric', "#FFFFFF", { isMetric: true });
@@ -307,24 +308,25 @@ export default function MapApp() {
         {/* Route Info Overlay */}
         {selectedRoute != null &&
           <div className="absolute bottom-4 right-4 left-4 sm:left-auto pointer-events-none">
-            <div className="bg-white bg-opacity-90 p-4 rounded-xl shadow-md text-left pointer-events-auto">
-              <div className="gap-2 max-w-[600px] lg:min-w-[500px] sm:min-w-[400px] w-full grid grid-flow-cols grid-cols-1 max-h-[400px]">
-                {selectedMetric.metricType == null && < div >
-                  <div className="text-lg font-bold text-black text-center">
-                    Route Info
-                  </div>
-                  <div
-                    className="mx-4 text-base font-medium"
-                  >
-                    <div>
-                      Distance: {FormatHelper.formatDistancePrecise(selectedRoute.distance, false, true)}
+            <div className="bg-white bg-opacity-90 py-4 rounded-xl shadow-md text-left pointer-events-auto">
+              <div className="gap-2 max-w-[600px] lg:min-w-[500px] sm:min-w-[400px] w-full grid grid-flow-cols grid-cols-1 px-4">
+                {selectedMetric.metricType == null &&
+                  <div>
+                    <div className="text-lg font-bold text-black text-center">
+                      Route Info
                     </div>
-                    <div>
-                      Duration: {FormatHelper.formatDuration(selectedRoute.duration)}
+                    <div
+                      className="mx-4 text-base font-medium"
+                    >
+                      <div>
+                        Distance: {FormatHelper.formatDistancePrecise(selectedRoute.distance, false, true)}
+                      </div>
+                      <div>
+                        Duration: {FormatHelper.formatDuration(selectedRoute.duration)}
+                      </div>
                     </div>
-                  </div>
-                </div>}
-                <Metrics route={selectedRoute!} selectedMetricType={selectedMetric.metricType} selectedMetric={selectedMetric.metric} onMetricChange={(type: MetricType, metric: string) => { setSelectedMetric({ metricType: type, metric: metric }) }} />
+                  </div>}
+                <Metrics route={selectedRoute} selectedMetricType={selectedMetric.metricType} selectedMetric={selectedMetric.metric} onMetricChange={(type: MetricType, metric: string) => { setSelectedMetric({ metricType: type, metric: metric }) }} />
               </div>
             </div>
           </div>
