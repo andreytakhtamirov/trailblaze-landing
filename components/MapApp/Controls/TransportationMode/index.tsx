@@ -14,7 +14,7 @@ const TransportationMode: React.FC<{
             <div className="border-2 rounded-xl p-1">
                 <div className="grid gap-2 w-full grid-cols-3">
                     {activityActions.map((activity, index) => (
-                        <label key={index} className="flex flex-1 ">
+                        <label key={index} className="flex flex-1">
                             <input
                                 type="radio"
                                 name="activity"

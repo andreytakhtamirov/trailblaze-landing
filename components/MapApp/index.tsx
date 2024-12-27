@@ -13,7 +13,6 @@ import Metrics from './Details/Metrics';
 import { PolylineUtil } from '@/util/polyline';
 import { MetricType } from '@/chart/metricsChart';
 import { FormatHelper } from '@/util/formatHelper';
-import ElevationChart from '@/chart/elevationChart';
 
 interface SelectedMetricState {
   metric: string | null;
@@ -271,8 +270,8 @@ export default function MapApp() {
             <div className="bg-white bg-opacity-90 px-3 py-3 rounded-xl shadow-md text-left pointer-events-auto lg:min-w-[500px]">
 
               {/* Locations, Slider, and Transportation Mode Section */}
-              <div className="gap-2 sm:gap-4 w-full grid grid-flow-cols grid-cols-1 xl:w-auto rounded-xl">
-                <div className="border-b-2 sm:border-b-4 pb-2 sm:pb-4">
+              <div className="gap-3 sm:gap-4 w-full grid grid-flow-cols grid-cols-1 xl:w-auto rounded-xl">
+                <div className="border-b-2 sm:border-b-4 pb-2 sm:pb-2">
                   <Locations
                     isSettingOrigin={isSettingOrigin}
                     originPoint={originPoint}
