@@ -68,11 +68,11 @@ const PointLabel: React.FC<PointLabelProps> = ({ type, point, isSettingOrigin, o
                         })}
                         onClick={onClick}
                     >
-                        <div className="px-4 w-full flex flex-row items-center gap-4 justify-between h-full py-0.5 sm:py-1">
+                        <div className="px-2 sm:px-4 w-full flex flex-row items-center gap-4 justify-between h-full py-0.5 sm:py-1">
                             <div
-                                className={classNames(`bg-${colorForType()} h-4 w-4 flex-shrink-0 rounded-full`)}
+                                className={classNames(`bg-${colorForType()} h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 rounded-full`)}
                             />
-                            <span className="flex-grow flex-shrink w-fit leading-5">{markerToString(point)}</span>
+                            <span className="flex-grow flex-shrink w-fit leading-5 overflow-ellipsis line-clamp-1">{markerToString(point)}</span>
                             <MdOutlineEdit
                                 className={classNames("text-2xl", { "invisible": isActive() })}
                             />

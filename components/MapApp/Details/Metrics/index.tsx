@@ -44,7 +44,7 @@ const Metrics: React.FC<MetricsProps> = ({ route, selectedMetricType, selectedMe
             </div>
         }
         {selectedMetricType === null &&
-            <div className="overflow-scroll max-h-[200px] sm:max-h-none sm:overflow-auto">
+            <div className="overflow-scroll max-h-[100px] sm:max-h-none sm:overflow-auto">
                 <ElevationChart route={route} />
                 <div className="grid grid-flow-col grid-cols-2 mx-2">
                     <div className="sm:max-w-[450px] md:max-w-[1000px] border-r-2">
