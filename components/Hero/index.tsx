@@ -46,6 +46,23 @@ const Hero = () => {
               <p className="text-md font-semibold">
                 Available across all of North America
               </p>
+
+              <div className="mt-12 flex items-left justify-start flex-row xs:px-[40px] sm:px-0">
+                <a
+                  href="/app"
+                  className="text-md inline-flex h-[30px] w-full items-center justify-between gap-2.5 rounded-full bg-[#4E993F] px-6 py-8 font-medium text-white hover:opacity-90 sm:w-1/2 sm:text-base md:text-lg md:w-[250px] lg:text-xl"
+                >
+                  Try in Browser
+                  <Image
+                    width={30}
+                    height={30}
+                    src="/images/icon/icon-arrow-dark.svg"
+                    alt="Arrow"
+                    className="dark:hidden"
+                  />
+                </a>
+              </div>
+
             </div>
 
             <motion.div
