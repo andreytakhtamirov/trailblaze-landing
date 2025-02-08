@@ -1,5 +1,7 @@
-import { FaWalking, FaBicycle, FaMountain } from 'react-icons/fa';
-
+import Image from 'next/image';
+import React from 'react';
+import { IoBicycle } from "react-icons/io5";
+import { FaWalking } from 'react-icons/fa';
 
 const TransportationMode: React.FC<{
     setSelectedActivity: React.Dispatch<React.SetStateAction<string | null>>;
@@ -7,7 +9,13 @@ const TransportationMode: React.FC<{
 }> = ({ setSelectedActivity, selectedActivity }) => {
     const activityActions = ["walking", "cycling", "gravel_cycling"];
     const activityLabels = ["Walking", "Cycling", "Gravel Cycling"]
-    const activityIcons = [<FaWalking />, <FaBicycle />, <FaMountain />];
+    const activityIcons = [<FaWalking />, <IoBicycle />, <Image
+        width={20}
+        height={20}
+        src="/images/icon/icon-gravel-cycle.svg"
+        alt="Gravel Cycling"
+    />
+    ];
 
     return (
         <>
