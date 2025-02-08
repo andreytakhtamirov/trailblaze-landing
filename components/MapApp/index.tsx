@@ -4,7 +4,7 @@ import Slider from '@/components/MapApp/Controls/Slider';
 import TransportationMode from '@/components/MapApp/Controls/TransportationMode';
 import Locations from '@/components/MapApp/Controls/Locations'
 import { fetchRoute } from '@/requests/fetchRoute';
-import mapboxgl, { LngLat } from 'mapbox-gl'
+import mapboxgl, { LngLat, MapMouseEvent } from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Route } from '@/types/route';
@@ -80,25 +80,32 @@ export default function MapApp() {
   }, [originPoint, destinationPoint, sliderValue, selectedActivity]);
 
   useEffect(() => {
-    handleResize();
+    if (routes == null || selectedRoute == null) {
+      return;
+    }
+
+
+    const updateRoutes = async () => {
+      await removeRoutes();
+
+      for (let route of routes) {
+        route.setIsPrimary(selectedRoute == route);
+        if (selectedRoute != route) {
+          displayRoute(route);
+        }
+      }
+
+      displayRoute(selectedRoute);
+    };
+
+    updateRoutes();
   }, [selectedRoute]);
 
   useEffect(() => {
     if (routes == null || routes.length === 0) {
       return;
     }
-
-    const updateRoutes = async () => {
-      await removeRoutes();
-
-      setSelectedRoute(routes[routes.length - 1]);
-
-      for (let route of routes) {
-        displayRoute(route);
-      }
-    };
-
-    updateRoutes();
+    setSelectedRoute(routes[routes.length - 1]);
   }, [routes]);
 
   useEffect(() => {
@@ -209,13 +216,38 @@ export default function MapApp() {
       return;
     }
 
+    if (mapRef.current.getLayer(route.sourceId)) {
+      mapRef.current.removeLayer(route.sourceId);
+    }
+
+    if (mapRef.current.getSource(route.sourceId) != null) {
+      mapRef.current.removeSource(route.sourceId);
+    }
+
     mapRef.current.addSource(route.sourceId, route.sourceLayer);
     mapRef.current.addLayer(route.lineLayer);
+
+    mapRef.current.on('click', route.sourceId, function (e: MapMouseEvent) {
+      setSelectedRoute(route);
+    });
+
+    mapRef.current.on('mouseenter', route.sourceId, function () {
+      if (mapRef.current == null) {
+        return;
+      }
+      mapRef.current.getCanvas().style.cursor = 'pointer';
+    });
+
+    mapRef.current.on('mouseleave', route.sourceId, function () {
+      if (mapRef.current == null) {
+        return;
+      }
+      mapRef.current.getCanvas().style.cursor = '';
+    });
   }
 
   async function removeRoutes(): Promise<void> {
-    setSelectedRoute(null);
-    setSelectedMetric({ metric: null, metricType: null });
+    setSelectedMetric({ metric: null, metricType: selectedMetric.metricType });
     if (mapRef?.current == null) {
       return;
     }

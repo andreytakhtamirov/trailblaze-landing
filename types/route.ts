@@ -93,4 +93,12 @@ export class Route {
 
         return polylines;
     }
+
+    public setIsPrimary(isPrimary: boolean) {
+        this.lineLayer = PolylineUtil.getLineLayer(
+            this.layerId,
+            this.sourceId,
+            isPrimary ? '#FF0000' : '#808080'
+        );
+    } 
 }
