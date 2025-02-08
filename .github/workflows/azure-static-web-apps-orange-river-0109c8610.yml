@@ -37,7 +37,7 @@ jobs:
       - name: Create env file
         run: |
           touch .env
-          echo ASSET_HOST=${{ secrets.ASSET_HOST }} >> .env
+          echo NEXT_PUBLIC_ASSET_HOST=${{ secrets.NEXT_PUBLIC_ASSET_HOST }} >> .env
           echo CDN_ADDRESS=${{ secrets.CDN_ADDRESS }} >> .env
           echo NEXT_PUBLIC_APP_TOKEN=${{ secrets.NEXT_PUBLIC_APP_TOKEN }} >> .env
           echo NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }} >> .env

@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import Slider from '@/components/MapApp/Controls/Slider';
 import TransportationMode from '@/components/MapApp/Controls/TransportationMode';
