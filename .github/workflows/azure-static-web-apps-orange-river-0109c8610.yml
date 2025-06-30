@@ -40,7 +40,7 @@ jobs:
 
       - name: Build app using Buildpacks
         run: |
-          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app --ignore-file .gitignore .
+          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app --project ${{ secrets.GCP_PROJECT_ID }} --no-source
 
       - name: Deploy to Cloud Run
         run: |
