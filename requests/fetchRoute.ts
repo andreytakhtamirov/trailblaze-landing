@@ -6,7 +6,7 @@ export const fetchRoute = async (
     influence: number = 1000
 ) => {
     const authToken = process.env.NEXT_PUBLIC_APP_TOKEN;
-    const base = "https://trailblaze.azurewebsites.net";
+    const base = process.env.NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT;
     const url = base + "/v1/routes/create-route-graphhopper";
 
     const payload = {

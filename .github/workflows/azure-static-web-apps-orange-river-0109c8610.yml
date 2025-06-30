@@ -1,4 +1,4 @@
-name: Azure Static Web Apps CI/CD
+name: Google Cloud Run CI/CD
 
 on:
   push:
@@ -10,63 +10,51 @@ on:
       - main
 
 jobs:
-  build_and_deploy_job:
+  build_and_deploy:
+    runs-on: ubuntu-latest
     permissions:
       contents: 'read'
       id-token: 'write'
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    name: Build and Deploy Job
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          submodules: true
-          lfs: false
 
-      - id: 'auth'
-        uses: 'google-github-actions/auth@v2'
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
         with:
-            project_id: 'trailblaze-111111'
+          project_id: '${{ secrets.GCP_PROJECT_ID }}'
 
-      - name: Create env file
+      - name: Create .env file
         run: |
-          touch .env
-          echo NEXT_PUBLIC_ASSET_HOST=${{ secrets.NEXT_PUBLIC_ASSET_HOST }} >> .env
-          echo CDN_ADDRESS=${{ secrets.CDN_ADDRESS }} >> .env
-          echo NEXT_PUBLIC_APP_TOKEN=${{ secrets.NEXT_PUBLIC_APP_TOKEN }} >> .env
-          echo NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }} >> .env
-      - name: Build And Deploy
-        id: builddeploy
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ORANGE_RIVER_0109C8610 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
-          action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "/" # App source code path
-          api_location: "" # Api source code path - optional
-          output_location: "" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+          echo "NEXT_PUBLIC_APP_TOKEN=${{ secrets.NEXT_PUBLIC_APP_TOKEN }}" >> .env
+          echo "NEXT_PUBLIC_ASSET_HOST=${{ secrets.NEXT_PUBLIC_ASSET_HOST }}" >> .env
+          echo "NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}" >> .env
+          echo "CDN_ADDRESS=${{ secrets.CDN_ADDRESS }}" >> .env
+          echo "NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT }}" >> .env
 
-      - name: Run GCS Upload Script
+      - name: Build Docker image
         run: |
-          ./sync-to-bucket.sh
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app .
 
-  close_pull_request_job:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    runs-on: ubuntu-latest
-    name: Close Pull Request Job
-    steps:
-      - name: Close Pull Request
-        id: closepullrequest
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ORANGE_RIVER_0109C8610 }}
-          action: "close"
+      - name: Push Docker image to Google Container Registry
+        run: |
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy nextjs-app \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app \
+            --platform managed \
+            --region us-central1 \
+            --set-env-vars NEXT_PUBLIC_APP_TOKEN=${{ secrets.NEXT_PUBLIC_APP_TOKEN }},NEXT_PUBLIC_ASSET_HOST=${{ secrets.NEXT_PUBLIC_ASSET_HOST }},NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }},CDN_ADDRESS=${{ secrets.CDN_ADDRESS }},NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT }} \
+            --allow-unauthenticated
+
+      - name: Clean up Docker images
+        run: |
+          docker rmi gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app
