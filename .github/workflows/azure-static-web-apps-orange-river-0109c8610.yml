@@ -38,13 +38,9 @@ jobs:
           echo "CDN_ADDRESS=${{ secrets.CDN_ADDRESS }}" >> .env
           echo "NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT }}" >> .env
 
-      - name: Build Docker image
+      - name: Build app using Buildpacks
         run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app .
-
-      - name: Push Docker image to Google Container Registry
-        run: |
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app
+          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app --ignore-file .gitignore .
 
       - name: Deploy to Cloud Run
         run: |
@@ -54,7 +50,3 @@ jobs:
             --region us-central1 \
             --set-env-vars NEXT_PUBLIC_APP_TOKEN=${{ secrets.NEXT_PUBLIC_APP_TOKEN }},NEXT_PUBLIC_ASSET_HOST=${{ secrets.NEXT_PUBLIC_ASSET_HOST }},NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }},CDN_ADDRESS=${{ secrets.CDN_ADDRESS }},NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT }} \
             --allow-unauthenticated
-
-      - name: Clean up Docker images
-        run: |
-          docker rmi gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app
