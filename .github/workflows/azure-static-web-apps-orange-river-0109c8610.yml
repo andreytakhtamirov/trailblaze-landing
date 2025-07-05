@@ -1,4 +1,4 @@
-name: Google Cloud Run CI/CD
+name: GCP Cloud Run Next.js CI/CD
 
 on:
   push:
@@ -10,43 +10,60 @@ on:
       - main
 
 jobs:
-  build_and_deploy:
-    runs-on: ubuntu-latest
+  build_and_deploy_job:
     permissions:
       contents: 'read'
       id-token: 'write'
-    
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    name: Build and Deploy Job
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: true
+          lfs: false
 
-      - name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v2
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
         with:
-          project_id: '${{ secrets.GCP_PROJECT_ID }}'
+            project_id: '${{ secrets.GCP_PROJECT_ID }}'
 
-      - name: Create .env file
+      - name: Create env file
         run: |
-          echo "NEXT_PUBLIC_APP_TOKEN=${{ secrets.NEXT_PUBLIC_APP_TOKEN }}" >> .env
-          echo "NEXT_PUBLIC_ASSET_HOST=${{ secrets.NEXT_PUBLIC_ASSET_HOST }}" >> .env
-          echo "NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}" >> .env
-          echo "CDN_ADDRESS=${{ secrets.CDN_ADDRESS }}" >> .env
+          touch .env
+          echo NEXT_PUBLIC_ASSET_HOST=${{ secrets.NEXT_PUBLIC_ASSET_HOST }} >> .env
+          echo CDN_ADDRESS=${{ secrets.CDN_ADDRESS }} >> .env
+          echo NEXT_PUBLIC_APP_TOKEN=${{ secrets.NEXT_PUBLIC_APP_TOKEN }} >> .env
+          echo NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }} >> .env
           echo "NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT }}" >> .env
 
-      - name: Build app using Buildpacks
+      - name: Build Docker Image
         run: |
-          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app --project ${{ secrets.GCP_PROJECT_ID }} --no-source
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/trailblaze-app:$GITHUB_SHA .
+
+      - name: Push Docker Image
+        run: |
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/trailblaze-app:$GITHUB_SHA
 
       - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: trailblaze-app
+          image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/trailblaze-app:$GITHUB_SHA
+          region: us-central1
+          env_vars: |
+            NEXT_PUBLIC_ASSET_HOST=${{ secrets.NEXT_PUBLIC_ASSET_HOST }}
+            CDN_ADDRESS=${{ secrets.CDN_ADDRESS }}
+            NEXT_PUBLIC_APP_TOKEN=${{ secrets.NEXT_PUBLIC_APP_TOKEN }}
+            NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}
+            NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT}}
+
+      - name: Run GCS Upload Script
         run: |
-          gcloud run deploy nextjs-app \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app \
-            --platform managed \
-            --region us-central1 \
-            --set-env-vars NEXT_PUBLIC_APP_TOKEN=${{ secrets.NEXT_PUBLIC_APP_TOKEN }},NEXT_PUBLIC_ASSET_HOST=${{ secrets.NEXT_PUBLIC_ASSET_HOST }},NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }},CDN_ADDRESS=${{ secrets.CDN_ADDRESS }},NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT }} \
-            --allow-unauthenticated
+          ./sync-to-bucket.sh
