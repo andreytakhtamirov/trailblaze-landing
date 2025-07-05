@@ -21,6 +21,6 @@ COPY . .
 ENV PORT=8080
 
 CMD gcloud auth activate-service-account --key-file=/secrets/gcp-key.json && npm run deploy
-c
+
 # Start the Next.js servernod
 CMD ["npm", "start"]
