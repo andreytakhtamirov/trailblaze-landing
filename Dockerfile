@@ -17,7 +17,10 @@ RUN npm install --frozen-lockfile
 # Copy the rest of the application code
 COPY . .
 
+RUN gcloud auth activate-service-account --key-file=/secrets/gcp-key.json && npm run deploy
+
 # Expose port (Cloud Run automatically assigns ports but requires the container to listen on $PORT)
 ENV PORT=8080
 
-CMD gcloud auth activate-service-account --key-file=/secrets/gcp-key.json && npm run deploy && npm start
+# Start the Next.js servernod
+CMD ["npm", "start"]
