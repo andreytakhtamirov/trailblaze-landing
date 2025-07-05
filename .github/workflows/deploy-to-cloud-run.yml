@@ -63,7 +63,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: trailblaze-app
-          image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/trailblaze-app:$GITHUB_SHA
+          image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/trailblaze-app:${{ github.sha }}
           region: us-central1
           env_vars: |
             NEXT_PUBLIC_ASSET_HOST=${{ secrets.NEXT_PUBLIC_ASSET_HOST }}
