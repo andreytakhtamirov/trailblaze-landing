@@ -55,6 +55,10 @@ jobs:
         run: |
           docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/trailblaze-app:$GITHUB_SHA
 
+      - name: Run GCS Upload Script
+        run: |
+          ./sync-to-bucket.sh
+
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
@@ -66,8 +70,4 @@ jobs:
             CDN_ADDRESS=${{ secrets.CDN_ADDRESS }}
             NEXT_PUBLIC_APP_TOKEN=${{ secrets.NEXT_PUBLIC_APP_TOKEN }}
             NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}
-            NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT}}
-
-      - name: Run GCS Upload Script
-        run: |
-          ./sync-to-bucket.sh
+            NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT }}
