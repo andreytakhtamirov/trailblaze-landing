@@ -47,17 +47,25 @@ jobs:
           echo NEXT_PUBLIC_MAPBOX_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }} >> .env
           echo "NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_TRAILBLAZE_API_ENDPOINT }}" >> .env
 
+      - name: Create GCP credentials file
+        run: echo '${{ secrets.GCP_CREDENTIALS }}' > gcp-key.json
+
       - name: Build Docker Image
         run: |
           docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/trailblaze-app:$GITHUB_SHA .
 
+      - name: Run container to upload static assets
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/gcp-key.json:/secrets/gcp-key.json:ro \
+            gcr.io/${{ secrets.GCP_PROJECT_ID }}/trailblaze-app:${{ github.sha }}
+
+      - name: Remove GCP credentials file
+        run: rm gcp-key.json
+
       - name: Push Docker Image
         run: |
           docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/trailblaze-app:$GITHUB_SHA
-
-      - name: Run GCS Upload Script
-        run: |
-          ./sync-to-bucket.sh
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
