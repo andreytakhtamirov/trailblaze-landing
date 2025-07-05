@@ -20,4 +20,7 @@ COPY . .
 # Expose port (Cloud Run automatically assigns ports but requires the container to listen on $PORT)
 ENV PORT=8080
 
-CMD gcloud auth activate-service-account --key-file=/secrets/gcp-key.json && npm run deploy && npm start
+CMD gcloud auth activate-service-account --key-file=/secrets/gcp-key.json && npm run deploy
+c
+# Start the Next.js servernod
+CMD ["npm", "start"]
