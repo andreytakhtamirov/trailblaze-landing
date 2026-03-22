@@ -26,14 +26,14 @@ const Integration = () => {
               width={1200}
               height={400}
               sizes="(max-width: 768px) 100vw"
-              src="/images/shape/shape-dotted-light.svg"
+              src="/trailblaze-landing/images/shape/shape-dotted-light.svg"
               alt="Dotted"
               className="dark:hidden"
               style={{ position: "static" }}
             />
             <Image
               fill
-              src="/images/shape/shape-dotted-dark.svg"
+              src="/trailblaze-landing/images/shape/shape-dotted-dark.svg"
               alt="Dotted"
               className="hidden dark:block"
             />

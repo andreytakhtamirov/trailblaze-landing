@@ -47,22 +47,21 @@ const Hero = () => {
                 Available across all of North America
               </p>
 
-              <div className="mt-12 flex items-left justify-start flex-row xs:px-[40px] sm:px-0">
+              <div className="items-left mt-12 flex flex-row justify-start xs:px-[40px] sm:px-0">
                 <a
                   href="/app"
-                  className="text-md inline-flex h-[30px] w-full items-center justify-between gap-2.5 rounded-full bg-[#4E993F] px-6 py-8 font-medium text-white hover:opacity-90 sm:w-1/2 sm:text-base md:text-lg md:w-[250px] lg:text-xl"
+                  className="text-md inline-flex h-[30px] w-full items-center justify-between gap-2.5 rounded-full bg-[#4E993F] px-6 py-8 font-medium text-white hover:opacity-90 sm:w-1/2 sm:text-base md:w-[250px] md:text-lg lg:text-xl"
                 >
                   Try in Browser
                   <Image
                     width={30}
                     height={30}
-                    src="/images/icon/icon-arrow-dark.svg"
+                    src="/trailblaze-landing/images/icon/icon-arrow-dark.svg"
                     alt="Arrow"
                     className="dark:hidden"
                   />
                 </a>
               </div>
-
             </div>
 
             <motion.div
@@ -87,7 +86,7 @@ const Hero = () => {
                 <div className="sm:w-sm xs:w-xs relative aspect-[2/3] w-full bg-transparent">
                   <Image
                     className="object-contain drop-shadow-2xl"
-                    src="/images/features/app-screenshot.png"
+                    src="/trailblaze-landing/images/features/app-screenshot.png"
                     alt="Hero"
                     fill
                     sizes="(max-width: 768px) 90vw, 66vw"

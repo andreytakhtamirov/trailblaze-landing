@@ -18,13 +18,13 @@ const Signin = () => {
           <div className="absolute left-0 top-0 -z-1 h-2/3 w-full rounded-lg bg-gradient-to-t from-transparent to-[#dee7ff47] dark:bg-gradient-to-t dark:to-[#252A42]"></div>
           <div className="absolute bottom-17.5 left-0 -z-1 h-1/3 w-full">
             <Image
-              src="/images/shape/shape-dotted-light.svg"
+              src="/trailblaze-landing/images/shape/shape-dotted-light.svg"
               alt="Dotted"
               className="dark:hidden"
               fill
             />
             <Image
-              src="/images/shape/shape-dotted-dark.svg"
+              src="/trailblaze-landing/images/shape/shape-dotted-dark.svg"
               alt="Dotted"
               className="hidden dark:block"
               fill
@@ -152,7 +152,7 @@ const Signin = () => {
                       type="checkbox"
                       className="peer sr-only"
                     />
-                    <span className="border-gray-300 bg-gray-100 text-blue-600 dark:border-gray-600 dark:bg-gray-700 group mt-1 flex h-5 min-w-[20px] items-center justify-center rounded peer-checked:bg-primary">
+                    <span className="group mt-1 flex h-5 min-w-[20px] items-center justify-center rounded border-gray-300 bg-gray-100 text-blue-600 peer-checked:bg-primary dark:border-gray-600 dark:bg-gray-700">
                       <svg
                         className="opacity-0 peer-checked:group-[]:opacity-100"
                         width="10"
