@@ -66,7 +66,7 @@ const CTA = () => {
                 <div className="relative mx-auto aspect-[2/3] w-2/3 overflow-hidden bg-transparent">
                   <Image
                     className="object-cover object-top drop-shadow-2xl"
-                    src="/trailblaze-landing/images/features/app-screenshot-2.png"
+                    src="/images/features/app-screenshot-2.png"
                     alt="Hero"
                     fill
                     sizes="(max-width: 768px) 90vw, 66vw"
@@ -112,14 +112,14 @@ const CTA = () => {
                   <Image
                     width={30}
                     height={30}
-                    src="/trailblaze-landing/images/icon/icon-arrow-dark.svg"
+                    src="/images/icon/icon-arrow-dark.svg"
                     alt="Arrow"
                     className="dark:hidden"
                   />
                   <Image
                     width={30}
                     height={30}
-                    src="/trailblaze-landing/images/icon/icon-arrow-light.svg"
+                    src="/images/icon/icon-arrow-light.svg"
                     alt="Arrow"
                     className="hidden dark:block"
                   />
@@ -137,14 +137,14 @@ const CTA = () => {
                   <Image
                     width={30}
                     height={30}
-                    src="/trailblaze-landing/images/icon/icon-arrow-dark.svg"
+                    src="/images/icon/icon-arrow-dark.svg"
                     alt="Arrow"
                     className="dark:hidden"
                   />
                   <Image
                     width={30}
                     height={30}
-                    src="/trailblaze-landing/images/icon/icon-arrow-light.svg"
+                    src="/images/icon/icon-arrow-light.svg"
                     alt="Arrow"
                     className="hidden dark:block"
                   />

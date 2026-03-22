@@ -31,13 +31,13 @@ const Footer = () => {
                 <a href="/" className="relative">
                   <div className="relative h-[30px] w-[200px]">
                     <Image
-                      src="/trailblaze-landing/images/logo/logo-dark.svg"
+                      src="/images/logo/logo-dark.svg"
                       alt="logo"
                       fill
                       className="absolute inset-0 hidden dark:block"
                     />
                     <Image
-                      src="/trailblaze-landing/images/logo/logo-light.svg"
+                      src="/images/logo/logo-light.svg"
                       alt="logo"
                       fill
                       className="absolute inset-0 dark:hidden"

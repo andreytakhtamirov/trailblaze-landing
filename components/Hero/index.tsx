@@ -56,7 +56,7 @@ const Hero = () => {
                   <Image
                     width={30}
                     height={30}
-                    src="/trailblaze-landing/images/icon/icon-arrow-dark.svg"
+                    src="/images/icon/icon-arrow-dark.svg"
                     alt="Arrow"
                     className="dark:hidden"
                   />
@@ -86,7 +86,7 @@ const Hero = () => {
                 <div className="sm:w-sm xs:w-xs relative aspect-[2/3] w-full bg-transparent">
                   <Image
                     className="object-contain drop-shadow-2xl"
-                    src="/trailblaze-landing/images/features/app-screenshot.png"
+                    src="/images/features/app-screenshot.png"
                     alt="Hero"
                     fill
                     sizes="(max-width: 768px) 90vw, 66vw"

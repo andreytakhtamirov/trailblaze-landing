@@ -15,7 +15,7 @@ const TransportationMode: React.FC<{
     <Image
       width={20}
       height={20}
-      src="/trailblaze-landing/images/icon/icon-gravel-cycle.svg"
+      src="/images/icon/icon-gravel-cycle.svg"
       alt="Gravel Cycling"
     />,
   ];

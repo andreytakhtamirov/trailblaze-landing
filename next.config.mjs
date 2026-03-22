@@ -10,7 +10,6 @@ export default (phase) => {
   const nextConfig = {
     reactStrictMode: true,
     output: "export",
-    basePath: "/trailblaze-landing",
     images: {
       unoptimized: true,
     },
