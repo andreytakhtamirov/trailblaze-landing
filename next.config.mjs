@@ -8,7 +8,6 @@ export default (phase) => {
    * @type {import('next').NextConfig}
    */
   const nextConfig = {
-    assetPrefix: isDev ? undefined : assetHost,
     reactStrictMode: true,
     output: "export",
     basePath: "/trailblaze-landing",

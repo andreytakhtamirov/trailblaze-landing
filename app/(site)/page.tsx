@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   icons: [
     {
       rel: "icon",
-      url: "https://cdn.trailblaze.cc/images/favicon.ico",
+      url: "/trailblaze-landing/images/favicon.ico",
       type: "image/x-icon"
     },
   ]
